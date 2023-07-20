@@ -7,7 +7,7 @@ import onnxruntime as ort
 
 from ctyper import Array, Image, InputSize
 
-from .utils import preprocess_params_gen
+from .utils import preprocess_params_gen, post_process
 
 
 class NcnnModel:
@@ -67,6 +67,23 @@ class NcnnModel:
         ).substract_mean_normalize([], [1 / 255.0, 1 / 255.0, 1 / 255.0])
         return padded_frame
 
+    def infer(self, frame: Image):
+        """
+        Run inference on the given frame
+        """
+        tensor_in: ncnn.Mat = self.__preprocess(frame)
+        ex: ncnn.Extractor = self.__runner.create_extractor()
+        ex.input("images", tensor_in)  # type: ignore
+        ret1, mat_out1 = ex.extract("output0")  # stride 8
+        assert not ret1, "extract output0 with something wrong!"
+        ret2, mat_out2 = ex.extract("output1")  # stride 16
+        assert not ret2, "extract output1 with something wrong!"
+        ret3, mat_out3 = ex.extract("output2")  # stride 32
+        assert not ret3, "extract output2 with something wrong!"
+        outputs = [np.array(mat_out1), np.array(mat_out2), np.array(mat_out3)]
+        results = post_process(outputs, conf_thres=0.25, nms_thres=0.65)
+        return results
+
 
 class OrtModel:
     def __init__(self, filename: str, input_size: InputSize) -> None:
@@ -118,6 +135,18 @@ class OrtModel:
         tensor = np.transpose(tensor, (2, 0, 1))
         tensor = np.expand_dims(tensor, axis=0).astype(np.float32)
         return tensor
+
+    def infer(self, frame: Image):
+        """
+        Run inference on the given frame
+        """
+        tensor_in: Array = self.__preprocess(frame)
+        mat1, mat2, mat3 = self.__runner.run(
+            ["output0", "output1", "output2"], {"images": tensor_in}
+        )
+        outputs = [np.array(mat1), np.array(mat2), np.array(mat3)]
+        results = post_process(outputs, conf_thres=0.25, nms_thres=0.65)
+        return results
 
 
 class Model:
