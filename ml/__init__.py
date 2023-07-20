@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 import cv2
@@ -7,10 +8,10 @@ import onnxruntime as ort
 
 from ctyper import Array, Image, InputSize
 
-from .utils import preprocess_params_gen, post_process
+from .utils import post_process, preprocess_params_gen
 
 
-class NcnnModel:
+class _NcnnModel:
     def __init__(
         self,
         filename: str,
@@ -19,8 +20,8 @@ class NcnnModel:
         use_gpu: bool = False,
         use_big_core: bool = True,
     ) -> None:
-        self.bin: Path = Path(filename + ".bin")
-        self.param: Path = Path(filename + ".param")
+        self.bin: Path = Path(os.path.splitext(filename)[0] + ".bin")
+        self.param: Path = Path(os.path.splitext(filename)[0] + ".param")
         if input_size.w != input_size.h:
             raise NotImplementedError("currently rect input is not supported")
         self.input_size: InputSize = input_size
@@ -64,16 +65,17 @@ class NcnnModel:
             params.wpad - params.wpad // 2,
             ncnn.BorderType.BORDER_CONSTANT,  # type: ignore
             0.0,
-        ).substract_mean_normalize([], [1 / 255.0, 1 / 255.0, 1 / 255.0])
+        )
+        padded_frame.substract_mean_normalize([], [1 / 255.0, 1 / 255.0, 1 / 255.0])
         return padded_frame
 
     def infer(self, frame: Image):
         """
         Run inference on the given frame
         """
-        tensor_in: ncnn.Mat = self.__preprocess(frame)
         ex: ncnn.Extractor = self.__runner.create_extractor()
-        ex.input("images", tensor_in)  # type: ignore
+        mat_in = self.__preprocess(frame)
+        ex.input("images", mat_in)  # type: ignore
         ret1, mat_out1 = ex.extract("output0")  # stride 8
         assert not ret1, "extract output0 with something wrong!"
         ret2, mat_out2 = ex.extract("output1")  # stride 16
@@ -85,9 +87,9 @@ class NcnnModel:
         return results
 
 
-class OrtModel:
+class _OrtModel:
     def __init__(self, filename: str, input_size: InputSize) -> None:
-        self.onnx: Path = Path(filename + ".onnx")
+        self.onnx: Path = Path(os.path.splitext(filename)[0] + ".onnx")
         self.input_size: InputSize = input_size
         if not self.onnx.exists():
             raise FileNotFoundError("Onnx model file not found")
@@ -99,35 +101,18 @@ class OrtModel:
         self.__runner = ort.InferenceSession(str(self.onnx.absolute()))
 
     def __preprocess(self, frame: Image) -> Array:
-        w0: int = frame.shape[1]
-        h0: int = frame.shape[0]
-
-        w1: int = w0
-        h1: int = w1
-        wpad: int = 0
-        hpad: int = 0
-        scale: float = 1.0
-        if w0 > h0:
-            scale = float(InputSize.w / w0)
-            w1 = InputSize.w
-            h1 = int(h0 * scale)
-            wpad = 0
-            hpad = InputSize.h - h1
-        else:
-            scale = float(InputSize.h / h0)
-            h1 = InputSize.h
-            w1 = int(w0 * scale)
-            hpad = 0
-            wpad = InputSize.w - w1
-        interp = cv2.INTER_LINEAR if (scale > 1) else cv2.INTER_AREA
-        resized_frame: Image = cv2.resize(frame, (w1, h1), interpolation=interp)
+        params = preprocess_params_gen(frame, self.input_size)
+        interp = cv2.INTER_LINEAR if (params.scale > 1) else cv2.INTER_AREA
+        resized_frame: Image = cv2.resize(
+            frame, (params.w1, params.h1), interpolation=interp
+        )
         resized_frame = cv2.cvtColor(resized_frame, cv2.COLOR_BGR2RGB)
         padded_frame: Image = cv2.copyMakeBorder(
             resized_frame,
-            hpad // 2,
-            hpad - hpad // 2,
-            wpad // 2,
-            wpad - wpad // 2,
+            params.hpad // 2,
+            params.hpad - params.hpad // 2,
+            params.wpad // 2,
+            params.wpad - params.wpad // 2,
             cv2.BORDER_CONSTANT,
             0.0,
         )
@@ -154,12 +139,12 @@ class Model:
         self.backend_type: str = backend_type
         # (w, h)
         if self.backend_type == "ort":
-            self.model = OrtModel(filename, input_size)
+            self.model = _OrtModel(filename, input_size)
         elif self.backend_type == "ncnn":
-            self.model = NcnnModel(filename, input_size)
+            self.model = _NcnnModel(filename, input_size)
         else:
             raise ValueError("Invalid backend")
         self.model.load()
 
-    def infer(self):
-        pass
+    def infer(self, frame: Image):
+        return self.model.infer(frame)

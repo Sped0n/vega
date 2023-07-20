@@ -14,3 +14,19 @@ requires-python = ">=3.11.0"
 [tool.pyright]
 venvPath = "/Users/spedon/anaconda3/envs/drone2023/"
 venv = "drone2023"
+
+[tool.pytest.ini_options]
+addopts = [
+  "-s",
+  "--import-mode=importlib",
+  "--doctest-modules",
+  "--cache-clear",
+  "--cov",
+]
+
+[tool.coverage.run]
+include = ["ml/*"]
+relative_files = true
+
+[tool.coverage.report]
+include = ["ml/*"]
