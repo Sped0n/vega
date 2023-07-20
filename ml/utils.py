@@ -1,7 +1,9 @@
 from typing import Sequence
-import numpy as np
-from ctyper import Array, MatNotValid
+
 import cv2
+import numpy as np
+
+from ctyper import Array, Image, InputSize, MatNotValid, MLPreprocessParams
 
 
 def sigmoid(x: Array) -> Array:
@@ -120,3 +122,29 @@ def post_process(
         boxes.append(raw_boxes[idx])
         labels.append(raw_labels[idx])
     return boxes, scores, labels
+
+
+def preprocess_params_gen(frame: Image, input_size: InputSize) -> MLPreprocessParams:
+    """
+    generate preprocess params, like params for resizing and padding
+    :param frame: input frame
+    :param input_size: input size
+    :return: preprocess params
+    """
+    params = MLPreprocessParams(
+        w0=frame.shape[1], h0=frame.shape[0], w1=-1, h1=-1, wpad=-1, hpad=-1, scale=-1.0
+    )
+
+    if params.w0 > params.h0:
+        params.scale = float(input_size.w / params.w0)
+        params.w1 = input_size.w
+        params.h1 = int(params.h0 * params.scale)
+        params.wpad = 0
+        params.hpad = input_size.h - params.h1
+    else:
+        params.scale = float(input_size.h / params.h0)
+        params.h1 = input_size.h
+        params.w1 = int(params.w0 * params.scale)
+        params.hpad = 0
+        params.wpad = input_size.w - params.w1
+    return params
