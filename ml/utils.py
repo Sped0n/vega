@@ -10,7 +10,8 @@ def sigmoid(x: Array) -> Array:
     """
     sigmoid function
 
-    >>> sigmoid(0) == 0.5
+    >>> sigmoid(0)
+    0.5
 
     :param x: input
     :return: sigmoid(x)
@@ -22,7 +23,8 @@ def softmax(x: Array, axis: int = -1) -> Array:
     """
     softmax function
 
-    >>> softmax([0, 1, 2]) == [0.09003057, 0.24472847, 0.66524096]
+    >>> softmax([0, 1, 2])
+    array([0.09003057, 0.24472847, 0.66524096])
 
     :param x: input
     :param axis: axis
