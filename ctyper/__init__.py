@@ -25,6 +25,38 @@ class MLPreprocessParams:
     wpad: int
     hpad: int
     scale: float
+    dw: int
+    dh: int
+
+
+@dataclasses.dataclass
+class RawDiagBbox:
+    x0: float
+    y0: float
+    x1: float
+    y1: float
+
+
+@dataclasses.dataclass
+class DiagBbox:
+    x0: int
+    y0: int
+    x1: int
+    y1: int
+
+
+@dataclasses.dataclass
+class RawObjDetected:
+    box: RawDiagBbox
+    score: float
+    clsid: int
+
+
+@dataclasses.dataclass
+class ObjDetected:
+    box: DiagBbox
+    score: float
+    clsid: int
 
 
 # custom exceptions
