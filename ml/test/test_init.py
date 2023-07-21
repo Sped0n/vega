@@ -1,11 +1,41 @@
 from pathlib import Path
 
 import cv2
+from objprint import op
 
-from ctyper import InputSize
+from ctyper import InputSize, ObjDetected
 from ml import Model
 
 TEST_DATA_DIR = str(Path(__file__).resolve().parent / "data") + "/"
+
+
+def infer_validator(res: list[ObjDetected]):
+    # only for bus.jpg!!!
+    expected = [
+        (146, 650, 0.7, 0),
+        (416, 492, 0.7, 5),
+        (284, 627, 0.65, 0),
+        (739, 634, 0.6, 0),
+        (32, 720, 0.25, 0),
+    ]
+    # number of detected objects
+    assert len(res) == 5
+    # label/score/box center verification
+    for result in res:
+        cx = (result.box.x0 + result.box.x1) // 2
+        cy = (result.box.y0 + result.box.y1) // 2
+        founded = False
+        cmp = (0, 0, 0, 0)
+        for i, e in enumerate(expected):
+            if (cx - e[0]) / e[0] <= 0.1 and (cy - e[1]) / e[1] <= 0.1:
+                founded = True
+                cmp = expected.pop(i)
+                break
+        assert founded is True
+        if not founded:
+            continue
+        assert result.clsid == cmp[3]
+        assert result.score >= cmp[2]
 
 
 # onnxruntime test
@@ -33,30 +63,18 @@ def test_onnx_rel_path_init_robust():
     assert model.backend_type == "ort"
 
 
-def test_onnx_infer():
+def test_onnx_infer_runnable():
     isize = InputSize(416, 416)
     model = Model(TEST_DATA_DIR + "test", isize, "ort")
     frame = cv2.imread(TEST_DATA_DIR + "bus.jpg")
-    result = model.infer(frame)
-    # box, score, label
-    assert len(result) == 3
-    # label verification
-    assert len(result[2]) == 5
-    human_counter = 0
-    bus_counter = 0
-    for label_index in result[2]:
-        if label_index == 0:
-            human_counter += 1
-        elif label_index == 5:
-            bus_counter += 1
-        else:
-            pass
-    assert human_counter == 4
-    assert bus_counter == 1
-    # score verification
-    assert len(result[1]) == 5
-    for score in result[1]:
-        assert score > 0.25
+    assert model.infer(frame) is not None
+
+
+def test_onnx_infer_valid():
+    isize = InputSize(416, 416)
+    model = Model(TEST_DATA_DIR + "test", isize, "ort")
+    frame = cv2.imread(TEST_DATA_DIR + "bus.jpg")
+    infer_validator(model.infer(frame, conf_thres=0.25, nms_thres=0.65))
 
 
 # ncnn test
@@ -84,27 +102,15 @@ def test_ncnn_rel_path_init_robust():
     assert model.backend_type == "ncnn"
 
 
-def test_ncnn_infer():
+def test_ncnn_infer_runnable():
     isize = InputSize(416, 416)
     model = Model(TEST_DATA_DIR + "test", isize, "ncnn")
     frame = cv2.imread(TEST_DATA_DIR + "bus.jpg")
-    result = model.infer(frame)
-    # box, score, label
-    assert len(result) == 3
-    # label verification
-    assert len(result[2]) == 5
-    human_counter = 0
-    bus_counter = 0
-    for label_index in result[2]:
-        if label_index == 0:
-            human_counter += 1
-        elif label_index == 5:
-            bus_counter += 1
-        else:
-            pass
-    assert human_counter == 4
-    assert bus_counter == 1
-    # score verification
-    assert len(result[1]) == 5
-    for score in result[1]:
-        assert score > 0.25
+    assert model.infer(frame) is not None
+
+
+def test_ncnn_infer_valid():
+    isize = InputSize(416, 416)
+    model = Model(TEST_DATA_DIR + "test", isize, "ncnn")
+    frame = cv2.imread(TEST_DATA_DIR + "bus.jpg")
+    infer_validator(model.infer(frame, conf_thres=0.25, nms_thres=0.65))
