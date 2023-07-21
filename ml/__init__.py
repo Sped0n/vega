@@ -6,7 +6,7 @@ import ncnn
 import numpy as np
 import onnxruntime as ort
 
-from ctyper import Array, Image, InputSize
+from ctyper import Array, Image, InputSize, MLPreprocessParams, ObjDetected
 
 from .utils import post_process, preprocess_params_gen
 
@@ -48,30 +48,32 @@ class _NcnnModel:
         self.__runner.load_model(str(self.bin.absolute()))
 
     def __preprocess(self, frame: Image) -> ncnn.Mat:
-        params = preprocess_params_gen(frame, self.input_size)
+        self.pps_params: MLPreprocessParams = preprocess_params_gen(
+            frame, self.input_size
+        )
         resized_frame: ncnn.Mat = ncnn.Mat.from_pixels_resize(
             frame,
             ncnn.Mat.PixelType.PIXEL_BGR2RGB,  # type: ignore
-            params.w0,
-            params.h0,
-            params.w1,
-            params.h1,
+            self.pps_params.w0,
+            self.pps_params.h0,
+            self.pps_params.w1,
+            self.pps_params.h1,
         )
         padded_frame: ncnn.Mat = ncnn.copy_make_border(
             resized_frame,
-            params.hpad // 2,
-            params.hpad - params.hpad // 2,
-            params.wpad // 2,
-            params.wpad - params.wpad // 2,
+            self.pps_params.dh,
+            self.pps_params.hpad - self.pps_params.dh,
+            self.pps_params.dw,
+            self.pps_params.wpad - self.pps_params.dw,
             ncnn.BorderType.BORDER_CONSTANT,  # type: ignore
             0.0,
         )
         padded_frame.substract_mean_normalize([], [1 / 255.0, 1 / 255.0, 1 / 255.0])
         return padded_frame
 
-    def infer(self, frame: Image):
+    def infer(self, frame: Image, conf_thres: float = 0.25, nms_thres: float = 0.65):
         """
-        Run inference on the given frame
+        run inference on the given frame
         """
         ex: ncnn.Extractor = self.__runner.create_extractor()
         mat_in = self.__preprocess(frame)
@@ -82,8 +84,8 @@ class _NcnnModel:
         assert not ret2, "extract output1 with something wrong!"
         ret3, mat_out3 = ex.extract("output2")  # stride 32
         assert not ret3, "extract output2 with something wrong!"
-        outputs = [np.array(mat_out1), np.array(mat_out2), np.array(mat_out3)]
-        results = post_process(outputs, conf_thres=0.25, nms_thres=0.65)
+        outputs = (np.array(mat_out1), np.array(mat_out2), np.array(mat_out3))
+        results = post_process(outputs, self.pps_params, conf_thres, nms_thres)
         return results
 
 
@@ -96,23 +98,25 @@ class _OrtModel:
 
     def load(self):
         """
-        Load the model file and set backend
+        load the model file and set backend
         """
         self.__runner = ort.InferenceSession(str(self.onnx.absolute()))
 
     def __preprocess(self, frame: Image) -> Array:
-        params = preprocess_params_gen(frame, self.input_size)
-        interp = cv2.INTER_LINEAR if (params.scale > 1) else cv2.INTER_AREA
+        self.pps_params: MLPreprocessParams = preprocess_params_gen(
+            frame, self.input_size
+        )
+        interp = cv2.INTER_LINEAR if (self.pps_params.scale > 1) else cv2.INTER_AREA
         resized_frame: Image = cv2.resize(
-            frame, (params.w1, params.h1), interpolation=interp
+            frame, (self.pps_params.w1, self.pps_params.h1), interpolation=interp
         )
         resized_frame = cv2.cvtColor(resized_frame, cv2.COLOR_BGR2RGB)
         padded_frame: Image = cv2.copyMakeBorder(
             resized_frame,
-            params.hpad // 2,
-            params.hpad - params.hpad // 2,
-            params.wpad // 2,
-            params.wpad - params.wpad // 2,
+            self.pps_params.dh,
+            self.pps_params.hpad - self.pps_params.dh,
+            self.pps_params.dw,
+            self.pps_params.wpad - self.pps_params.dw,
             cv2.BORDER_CONSTANT,
             0.0,
         )
@@ -121,16 +125,16 @@ class _OrtModel:
         tensor = np.expand_dims(tensor, axis=0).astype(np.float32)
         return tensor
 
-    def infer(self, frame: Image):
+    def infer(self, frame: Image, conf_thres: float = 0.25, nms_thres: float = 0.65):
         """
-        Run inference on the given frame
+        run inference on the given frame
         """
         tensor_in: Array = self.__preprocess(frame)
         mat1, mat2, mat3 = self.__runner.run(
             ["output0", "output1", "output2"], {"images": tensor_in}
         )
-        outputs = [np.array(mat1), np.array(mat2), np.array(mat3)]
-        results = post_process(outputs, conf_thres=0.25, nms_thres=0.65)
+        outputs = (np.array(mat1), np.array(mat2), np.array(mat3))
+        results = post_process(outputs, self.pps_params, conf_thres, nms_thres)
         return results
 
 
@@ -146,5 +150,7 @@ class Model:
             raise ValueError("Invalid backend")
         self.model.load()
 
-    def infer(self, frame: Image):
-        return self.model.infer(frame)
+    def infer(
+        self, frame: Image, conf_thres: float = 0.25, nms_thres: float = 0.65
+    ) -> list[ObjDetected]:
+        return self.model.infer(frame, conf_thres, nms_thres)

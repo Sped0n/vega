@@ -1,9 +1,19 @@
+import math
 from typing import Sequence
 
 import cv2
 import numpy as np
 
-from ctyper import Array, Image, InputSize, MatNotValid, MLPreprocessParams
+from ctyper import (
+    Array,
+    DiagBbox,
+    Image,
+    InputSize,
+    MatNotValid,
+    MLPreprocessParams,
+    ObjDetected,
+    RawDiagBbox,
+)
 
 
 def sigmoid(x: Array) -> Array:
@@ -36,11 +46,12 @@ def softmax(x: Array, axis: int = -1) -> Array:
 
 
 def post_process(
-    mats: list[Array],
+    mats: tuple[Array, Array, Array],
+    pps_params: MLPreprocessParams,
     conf_thres: float = 0.25,
     nms_thres: float = 0.65,
     reg_max: int = 16,
-):
+) -> list[ObjDetected]:
     """
     post process for yolov8
     :param mats: 3 output tensors(detector head) from model output
@@ -116,14 +127,21 @@ def post_process(
     nms_indices: Sequence[int] = cv2.dnn.NMSBoxesBatched(
         raw_boxes, raw_scores, raw_labels, conf_thres, nms_thres
     )
-    scores: list[float] = []
-    boxes: list[Array] = []
-    labels: list[int] = []
+    results: list[ObjDetected] = []
     for idx in nms_indices:
-        scores.append(raw_scores[idx])
-        boxes.append(raw_boxes[idx])
-        labels.append(raw_labels[idx])
-    return boxes, scores, labels
+        tmp = raw_boxes[idx]
+        # xywh to xyxy
+        tmp[2:] = tmp[:2] + tmp[2:]
+        results.append(
+            ObjDetected(
+                box=box_translator(
+                    RawDiagBbox(tmp[0], tmp[1], tmp[2], tmp[3]), pps_params
+                ),
+                score=raw_scores[idx],
+                clsid=raw_labels[idx],
+            )
+        )
+    return results
 
 
 def preprocess_params_gen(frame: Image, input_size: InputSize) -> MLPreprocessParams:
@@ -134,7 +152,15 @@ def preprocess_params_gen(frame: Image, input_size: InputSize) -> MLPreprocessPa
     :return: preprocess params
     """
     params = MLPreprocessParams(
-        w0=frame.shape[1], h0=frame.shape[0], w1=-1, h1=-1, wpad=-1, hpad=-1, scale=-1.0
+        w0=frame.shape[1],
+        h0=frame.shape[0],
+        w1=-1,
+        h1=-1,
+        wpad=-1,
+        hpad=-1,
+        scale=-1.0,
+        dw=-1,
+        dh=-1,
     )
 
     if params.w0 > params.h0:
@@ -149,4 +175,24 @@ def preprocess_params_gen(frame: Image, input_size: InputSize) -> MLPreprocessPa
         params.w1 = int(params.w0 * params.scale)
         params.hpad = 0
         params.wpad = input_size.w - params.w1
+    params.dw = params.wpad // 2
+    params.dh = params.hpad // 2
     return params
+
+
+def box_translator(bbox_in: RawDiagBbox, params: MLPreprocessParams) -> DiagBbox:
+    x0, y0, x1, y1 = bbox_in.x0, bbox_in.y0, bbox_in.x1, bbox_in.y1
+
+    # scale back
+    x0 = (x0 - params.dw) / params.scale
+    y0 = (y0 - params.dh) / params.scale
+    x1 = (x1 - params.dw) / params.scale
+    y1 = (y1 - params.dh) / params.scale
+
+    # clip image
+    x0 = min(max(x0, 1), params.w0 - 1)
+    y0 = min(max(y0, 1), params.h0 - 1)
+    x1 = min(max(x1, 1), params.w0 - 1)
+    y1 = min(max(y1, 1), params.h0 - 1)
+
+    return DiagBbox(math.floor(x0), math.floor(y0), math.ceil(x1), math.ceil(y1))
