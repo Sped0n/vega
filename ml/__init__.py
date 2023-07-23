@@ -6,7 +6,17 @@ import ncnn
 import numpy as np
 import onnxruntime as ort
 
-from ctyper import Array, Image, InputSize, MLPreprocessParams, ObjDetected
+from ctyper import (
+    Array,
+    Image,
+    InferError,
+    InputSize,
+    MLPreprocessParams,
+    ObjDetected,
+    InferExtractError,
+    InferPreprocessError,
+    InferPostprocessError,
+)
 
 from .utils import post_process, preprocess_params_gen
 
@@ -79,11 +89,14 @@ class _NcnnModel:
         mat_in = self.__preprocess(frame)
         ex.input("images", mat_in)  # type: ignore
         ret1, mat_out1 = ex.extract("output0")  # stride 8
-        assert not ret1, "extract output0 with something wrong!"
+        if ret1 != 0:
+            raise InferExtractError("ncnn extract output0 with something wrong!")
         ret2, mat_out2 = ex.extract("output1")  # stride 16
-        assert not ret2, "extract output1 with something wrong!"
+        if ret2 != 0:
+            raise InferExtractError("extract output1 with something wrong!")
         ret3, mat_out3 = ex.extract("output2")  # stride 32
-        assert not ret3, "extract output2 with something wrong!"
+        if ret3 != 0:
+            raise InferExtractError("extract output2 with something wrong!")
         outputs = (np.array(mat_out1), np.array(mat_out2), np.array(mat_out3))
         results = post_process(outputs, self.pps_params, conf_thres, nms_thres)
         return results

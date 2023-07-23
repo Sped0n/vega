@@ -62,3 +62,19 @@ class ObjDetected:
 # custom exceptions
 class MatNotValid(Exception):
     pass
+
+
+class InferError(Exception):
+    pass
+
+
+class InferExtractError(Exception):
+    pass
+
+
+class InferPreprocessError(Exception):
+    pass
+
+
+class InferPostprocessError(Exception):
+    pass
