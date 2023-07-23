@@ -78,3 +78,11 @@ class InferPreprocessError(Exception):
 
 class InferPostprocessError(Exception):
     pass
+
+
+class NoDeviceError(Exception):
+    pass
+
+
+class DeviceInitError(Exception):
+    pass
