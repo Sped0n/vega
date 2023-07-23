@@ -3,7 +3,7 @@ import math
 
 import pyrealsense2 as rs
 
-from ctyper import NoDeviceError
+from ctyper import NoDeviceError, DepthArray, Image
 
 
 @dataclasses.dataclass
@@ -15,6 +15,14 @@ class PoseData:
     roll: float
     yaw: float
     confidence: int
+
+
+@dataclasses.dataclass
+class DCData:
+    depth: DepthArray
+    color: Image
+    dvalid: bool
+    cvalid: bool
 
 
 def rs_device_init(needed_cam_info: str) -> tuple[rs.pipeline, rs.config]:
