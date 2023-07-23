@@ -7,6 +7,7 @@ import numpy as np
 Image: TypeAlias = np.ndarray
 Color: TypeAlias = tuple[int, int, int]
 Array: TypeAlias = np.ndarray
+DepthArray: TypeAlias = np.ndarray
 
 
 # custom dataclass
@@ -85,4 +86,8 @@ class NoDeviceError(Exception):
 
 
 class DeviceInitError(Exception):
+    pass
+
+
+class FetchError(Exception):
     pass
