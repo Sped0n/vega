@@ -4,6 +4,7 @@ from ctyper import DeviceInitError, FetchError
 
 from sensia import T265, D435
 from warnings import warn
+import itertools
 
 ctx = rs.context()
 no_device = False
@@ -43,7 +44,8 @@ def test_d435_init():
             h = D435()
             assert isinstance(h, D435)
             h.stop()
-        except RuntimeError or DeviceInitError:
+        except RuntimeError as e:
+            assert "fetch" not in str(e)
             assert os.system == "Darwin"
             warn("pyrs2 issue on macos")
 
@@ -52,16 +54,23 @@ def test_d435_fetch_depth_only():
     if not no_device:
         try:
             h = D435(depth_only=True)
-            try:
-                d = h.fetch()
-            except FetchError:
-                h.restart()
-                d = h.fetch()
+            attempts = itertools.count()
+            while True:
+                try:
+                    d = h.fetch()
+                except FetchError:
+                    h.restart()
+                    if next(attempts) <= 3:
+                        continue
+                    else:
+                        raise
+                break
             assert d.dvalid is True
             assert d.depth.shape == (720, 1280)
             assert d.cvalid is False
             h.stop()
-        except RuntimeError or DeviceInitError:
+        except RuntimeError as e:
+            assert "fetch" not in str(e)
             assert os.system == "Darwin"
             warn("pyrs2 issue on macos")
 
@@ -70,17 +79,28 @@ def test_d435_fetch_default():
     if not no_device:
         try:
             h = D435()
-            try:
-                d = h.fetch()
-            except FetchError:
-                h.restart()
-                d = h.fetch()
+            attempts = itertools.count()
+            while True:
+                try:
+                    d = h.fetch()
+                except FetchError:
+                    h.restart()
+                    if next(attempts) <= 3:
+                        continue
+                    else:
+                        raise
+                break
             assert d.dvalid is True
             assert d.depth.shape == (720, 1280)
             assert d.cvalid is True
             assert d.color.shape == (720, 1280, 3)
             h.stop()
-        except RuntimeError or DeviceInitError:
+        except RuntimeError as e:
+            assert "fetch" not in str(e)
+            assert os.system == "Darwin"
+            warn("pyrs2 issue on macos")
+
+        except DeviceInitError:
             assert os.system == "Darwin"
             warn("pyrs2 issue on macos")
 
@@ -89,17 +109,28 @@ def test_d435_fetch_default_align():
     if not no_device:
         try:
             h = D435(align=True)
-            try:
-                d = h.fetch()
-            except FetchError:
-                h.restart()
-                d = h.fetch()
+            attempts = itertools.count()
+            while True:
+                try:
+                    d = h.fetch()
+                except FetchError:
+                    h.restart()
+                    if next(attempts) <= 3:
+                        continue
+                    else:
+                        raise
+                break
             assert d.dvalid is True
             assert d.depth.shape == (720, 1280)
             assert d.cvalid is True
             assert d.color.shape == (720, 1280, 3)
             h.stop()
-        except RuntimeError or DeviceInitError:
+        except RuntimeError as e:
+            assert "fetch" not in str(e)
+            assert os.system == "Darwin"
+            warn("pyrs2 issue on macos")
+
+        except DeviceInitError:
             assert os.system == "Darwin"
             warn("pyrs2 issue on macos")
 
@@ -108,17 +139,28 @@ def test_d435_fetch_hd():
     if not no_device:
         try:
             h = D435(hd=True)
-            try:
-                d = h.fetch()
-            except FetchError:
-                h.restart()
-                d = h.fetch()
+            attempts = itertools.count()
+            while True:
+                try:
+                    d = h.fetch()
+                except FetchError:
+                    h.restart()
+                    if next(attempts) <= 3:
+                        continue
+                    else:
+                        raise
+                break
             assert d.dvalid is True
             assert d.depth.shape == (720, 1280)
             assert d.cvalid is True
             assert d.color.shape == (1080, 1920, 3)
             h.stop()
-        except RuntimeError or DeviceInitError:
+        except RuntimeError as e:
+            assert "fetch" not in str(e)
+            assert os.system == "Darwin"
+            warn("pyrs2 issue on macos")
+
+        except DeviceInitError:
             assert os.system == "Darwin"
             warn("pyrs2 issue on macos")
 
@@ -127,16 +169,27 @@ def test_d435_fetch_hd_align():
     if not no_device:
         try:
             h = D435(hd=True, align=True)
-            try:
-                d = h.fetch()
-            except FetchError:
-                h.restart()
-                d = h.fetch()
+            attempts = itertools.count()
+            while True:
+                try:
+                    d = h.fetch()
+                except FetchError:
+                    h.restart()
+                    if next(attempts) <= 3:
+                        continue
+                    else:
+                        raise RuntimeError("failed to retry fetch")
+                break
             assert d.dvalid is True
             assert d.depth.shape == (1080, 1920)
             assert d.cvalid is True
             assert d.color.shape == (1080, 1920, 3)
             h.stop()
-        except RuntimeError or DeviceInitError:
+        except RuntimeError as e:
+            assert "fetch" not in str(e)
+            assert os.system == "Darwin"
+            warn("pyrs2 issue on macos")
+
+        except DeviceInitError:
             assert os.system == "Darwin"
             warn("pyrs2 issue on macos")
