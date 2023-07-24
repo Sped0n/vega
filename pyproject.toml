@@ -30,3 +30,4 @@ relative_files = true
 
 [tool.coverage.report]
 include = ["ml/*", "sensia/*"]
+omit = ["*/test*"]
