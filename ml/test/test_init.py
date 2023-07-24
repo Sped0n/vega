@@ -77,6 +77,15 @@ def test_onnx_infer_valid():
     infer_validator(model.infer(frame, conf_thres=0.25, nms_thres=0.65))
 
 
+def test_onnx_reinit():
+    isize = InputSize(416, 416)
+    model = Model(TEST_DATA_DIR + "test", isize, "ort")
+    frame = cv2.imread(TEST_DATA_DIR + "bus.jpg")
+    infer_validator(model.infer(frame, conf_thres=0.25, nms_thres=0.65))
+    model.reinit(TEST_DATA_DIR + "test.onnx", isize)
+    infer_validator(model.infer(frame, conf_thres=0.25, nms_thres=0.65))
+
+
 # ncnn test
 def test_ncnn_abs_path_init():
     isize = InputSize(416, 416)
@@ -113,4 +122,13 @@ def test_ncnn_infer_valid():
     isize = InputSize(416, 416)
     model = Model(TEST_DATA_DIR + "test", isize, "ncnn")
     frame = cv2.imread(TEST_DATA_DIR + "bus.jpg")
+    infer_validator(model.infer(frame, conf_thres=0.25, nms_thres=0.65))
+
+
+def test_ncnn_reinit():
+    isize = InputSize(416, 416)
+    model = Model(TEST_DATA_DIR + "test", isize, "ncnn")
+    frame = cv2.imread(TEST_DATA_DIR + "bus.jpg")
+    infer_validator(model.infer(frame, conf_thres=0.25, nms_thres=0.65))
+    model.reinit(TEST_DATA_DIR + "test.bin", isize)
     infer_validator(model.infer(frame, conf_thres=0.25, nms_thres=0.65))
