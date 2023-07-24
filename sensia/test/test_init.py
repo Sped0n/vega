@@ -1,10 +1,11 @@
-import pyrealsense2 as rs
-import os
-from ctyper import DeviceInitError, FetchError
-
-from sensia import T265, D435
-from warnings import warn
 import itertools
+import os
+from warnings import warn
+
+import pyrealsense2 as rs
+
+from ctyper import DeviceInitError, FetchError
+from sensia import D435, T265
 
 ctx = rs.context()
 no_device = False
@@ -46,7 +47,7 @@ def test_d435_init():
             h.stop()
         except RuntimeError as e:
             assert "fetch" not in str(e)
-            assert os.system == "Darwin"
+            assert str(os.system) == "Darwin"
             warn("pyrs2 issue on macos")
 
 
@@ -71,7 +72,10 @@ def test_d435_fetch_depth_only():
             h.stop()
         except RuntimeError as e:
             assert "fetch" not in str(e)
-            assert os.system == "Darwin"
+            assert str(os.system) == "Darwin"
+            warn("pyrs2 issue on macos")
+        except DeviceInitError:
+            assert str(os.system) == "Darwin"
             warn("pyrs2 issue on macos")
 
 
@@ -97,11 +101,10 @@ def test_d435_fetch_default():
             h.stop()
         except RuntimeError as e:
             assert "fetch" not in str(e)
-            assert os.system == "Darwin"
+            assert str(os.system) == "Darwin"
             warn("pyrs2 issue on macos")
-
         except DeviceInitError:
-            assert os.system == "Darwin"
+            assert str(os.system) == "Darwin"
             warn("pyrs2 issue on macos")
 
 
@@ -127,11 +130,10 @@ def test_d435_fetch_default_align():
             h.stop()
         except RuntimeError as e:
             assert "fetch" not in str(e)
-            assert os.system == "Darwin"
+            assert str(os.system) == "Darwin"
             warn("pyrs2 issue on macos")
-
         except DeviceInitError:
-            assert os.system == "Darwin"
+            assert str(os.system) == "Darwin"
             warn("pyrs2 issue on macos")
 
 
@@ -157,11 +159,10 @@ def test_d435_fetch_hd():
             h.stop()
         except RuntimeError as e:
             assert "fetch" not in str(e)
-            assert os.system == "Darwin"
+            assert str(os.system) == "Darwin"
             warn("pyrs2 issue on macos")
-
         except DeviceInitError:
-            assert os.system == "Darwin"
+            assert str(os.system) == "Darwin"
             warn("pyrs2 issue on macos")
 
 
@@ -187,9 +188,8 @@ def test_d435_fetch_hd_align():
             h.stop()
         except RuntimeError as e:
             assert "fetch" not in str(e)
-            assert os.system == "Darwin"
+            assert str(os.system) == "Darwin"
             warn("pyrs2 issue on macos")
-
         except DeviceInitError:
-            assert os.system == "Darwin"
+            assert str(os.system) == "Darwin"
             warn("pyrs2 issue on macos")
