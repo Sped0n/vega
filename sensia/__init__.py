@@ -8,6 +8,7 @@
 
 import numpy as np
 import pyrealsense2 as rs
+from typing import Callable
 
 from ctyper import DeviceInitError, NoDeviceError, FetchError
 
@@ -74,7 +75,9 @@ class D435:
         self.pipe.start(self.cfg)
         self.fail_count: int = 0
 
-    def fetch(self) -> DCData:
+    def fetch(
+        self, depth_filter: Callable[[rs.depth_frame], rs.depth_frame] | None = None
+    ) -> DCData:
         try:
             frames = self.pipe.wait_for_frames()
         except RuntimeError:
@@ -83,6 +86,8 @@ class D435:
         if self.align:
             frames = self.align.process(frames)  # type: ignore
         depth_frame = frames.get_depth_frame()
+        if depth_filter is not None:
+            depth_frame = depth_filter(depth_frame)
         depth_array = np.asanyarray(depth_frame.get_data())
         if self.depth_only:
             return DCData(depth_array, np.zeros(1), True, False)
