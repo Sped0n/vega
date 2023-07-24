@@ -72,3 +72,36 @@ def pose_data_process(data: rs.pose) -> PoseData:
     confidence = data.tracker_confidence
 
     return PoseData(x, y, z, pitch, roll, yaw, confidence)
+
+
+def plane_radar_filter(df: rs.depth_frame) -> rs.depth_frame:
+    """
+    filter for plane scan
+    """
+    dec = rs.decimation_filter()
+    dec.set_option(rs.option.filter_magnitude, 2)
+
+    ths = rs.threshold_filter()
+    ths.set_option(rs.option.min_distance, 0.3)
+    ths.set_option(rs.option.max_distance, 2.5)
+
+    spa = rs.spatial_filter()
+    spa.set_option(rs.option.filter_smooth_alpha, 0.5)
+    spa.set_option(rs.option.filter_smooth_delta, 30)
+    spa.set_option(rs.option.holes_fill, 2)
+
+    tbf = rs.temporal_filter()
+    tbf.set_option(rs.option.filter_smooth_alpha, 0.8)
+    tbf.set_option(rs.option.filter_smooth_delta, 30)
+
+    # 1280x720 -> 640x368
+    temp: rs.depth_frame = dec.process(df)
+    temp = spa.process(temp)
+    temp = tbf.process(temp)
+    # 640x368 -> 320x184
+    temp = dec.process(temp)
+    # 320x184 -> 160x92
+    temp = dec.process(temp)
+    temp = ths.process(temp)
+
+    return temp
