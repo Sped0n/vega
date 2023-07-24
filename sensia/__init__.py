@@ -35,7 +35,9 @@ class T265:
             data = pose.get_pose_data()
             return pose_data_process(data)
         else:
-            return PoseData(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1)
+            raise FetchError(
+                "T265 has got the frame, but the frame doesn't contain pose data"
+            )
 
     def stop(self) -> None:
         try:
