@@ -9,13 +9,10 @@ import onnxruntime as ort
 from ctyper import (
     Array,
     Image,
-    InferError,
+    InferExtractError,
     InputSize,
     MLPreprocessParams,
     ObjDetected,
-    InferExtractError,
-    InferPreprocessError,
-    InferPostprocessError,
 )
 
 from .utils import post_process, preprocess_params_gen
@@ -54,7 +51,6 @@ class _NcnnModel:
                 self.clear()
         except AttributeError as e:
             assert "has no attribute 'loaded'" in str(e)
-            pass
         self.bin: Path = Path(os.path.splitext(filename)[0] + ".bin")
         self.param: Path = Path(os.path.splitext(filename)[0] + ".param")
         if input_size.w != input_size.h:
@@ -110,7 +106,9 @@ class _NcnnModel:
         padded_frame.substract_mean_normalize([], [1 / 255.0, 1 / 255.0, 1 / 255.0])
         return padded_frame
 
-    def infer(self, frame: Image, conf_thres: float = 0.25, nms_thres: float = 0.65):
+    def infer(
+        self, frame: Image, conf_thres: float = 0.25, nms_thres: float = 0.65
+    ) -> list[ObjDetected]:
         """
         run inference on the given frame
         """
@@ -131,7 +129,7 @@ class _NcnnModel:
         results = post_process(outputs, self.pps_params, conf_thres, nms_thres)
         return results
 
-    def clear(self):
+    def clear(self) -> None:
         """
         clear the model
         """
@@ -150,14 +148,13 @@ class _OrtModel:
                 self.clear()
         except AttributeError as e:
             assert "has no attribute 'loaded'" in str(e)
-            pass
         self.onnx: Path = Path(os.path.splitext(filename)[0] + ".onnx")
         self.input_size: InputSize = input_size
         if not self.onnx.exists():
             raise FileNotFoundError("Onnx model file not found")
         self.loaded: bool = False
 
-    def load(self):
+    def load(self) -> None:
         """
         load the model file and set backend
         """
@@ -187,7 +184,9 @@ class _OrtModel:
         tensor = np.expand_dims(tensor, axis=0).astype(np.float32)
         return tensor
 
-    def infer(self, frame: Image, conf_thres: float = 0.25, nms_thres: float = 0.65):
+    def infer(
+        self, frame: Image, conf_thres: float = 0.25, nms_thres: float = 0.65
+    ) -> list[ObjDetected]:
         """
         run inference on the given frame
         """
@@ -200,7 +199,7 @@ class _OrtModel:
         results = post_process(outputs, self.pps_params, conf_thres, nms_thres)
         return results
 
-    def clear(self):
+    def clear(self) -> None:
         """
         clear the model
         """
@@ -209,7 +208,7 @@ class _OrtModel:
 
 
 class Model:
-    def __init__(self, filename: str, input_size: InputSize, backend_type: str):
+    def __init__(self, filename: str, input_size: InputSize, backend_type: str) -> None:
         self.backend_type: str = backend_type
         # (w, h)
         if self.backend_type == "ort":
@@ -225,9 +224,9 @@ class Model:
     ) -> list[ObjDetected]:
         return self.model.infer(frame, conf_thres, nms_thres)
 
-    def clear(self):
+    def clear(self) -> None:
         self.model.clear()
 
-    def reinit(self, filename: str, input_size: InputSize):
+    def reinit(self, filename: str, input_size: InputSize) -> None:
         self.model.reinit_with(filename, input_size)
         self.model.load()
