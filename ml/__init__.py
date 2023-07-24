@@ -29,7 +29,32 @@ class _NcnnModel:
         num_threads: int = 2,
         use_gpu: bool = False,
         use_big_core: bool = True,
+        light_mode: bool = True,
     ) -> None:
+        self.reinit_with(
+            filename,
+            input_size,
+            num_threads,
+            use_gpu,
+            use_big_core,
+            light_mode,
+        )
+
+    def reinit_with(
+        self,
+        filename: str,
+        input_size: InputSize,
+        num_threads: int = 2,
+        use_gpu: bool = False,
+        use_big_core: bool = True,
+        light_mode: bool = True,
+    ) -> None:
+        try:
+            if self.loaded is True:
+                self.clear()
+        except AttributeError as e:
+            assert "has no attribute 'loaded'" in str(e)
+            pass
         self.bin: Path = Path(os.path.splitext(filename)[0] + ".bin")
         self.param: Path = Path(os.path.splitext(filename)[0] + ".param")
         if input_size.w != input_size.h:
@@ -38,8 +63,10 @@ class _NcnnModel:
         self.num_threads = num_threads
         self.use_gpu = use_gpu
         self.use_big_core = use_big_core
+        self.light_mode = light_mode
         if not self.bin.exists() or not self.param.exists():
             raise FileNotFoundError("Ncnn model file not found")
+        self.loaded: bool = False
 
     def load(self):
         """
@@ -53,9 +80,11 @@ class _NcnnModel:
         # set opts
         self.__runner.opt.num_threads = self.num_threads
         self.__runner.opt.use_vulkan_compute = self.use_gpu
+        self.__runner.opt.lightmode = self.light_mode
         # load file
         self.__runner.load_param(str(self.param.absolute()))
         self.__runner.load_model(str(self.bin.absolute()))
+        self.loaded = True
 
     def __preprocess(self, frame: Image) -> ncnn.Mat:
         self.pps_params: MLPreprocessParams = preprocess_params_gen(
@@ -85,6 +114,7 @@ class _NcnnModel:
         """
         run inference on the given frame
         """
+        assert self.__runner is not None
         ex: ncnn.Extractor = self.__runner.create_extractor()
         mat_in = self.__preprocess(frame)
         ex.input("images", mat_in)  # type: ignore
@@ -101,19 +131,38 @@ class _NcnnModel:
         results = post_process(outputs, self.pps_params, conf_thres, nms_thres)
         return results
 
+    def clear(self):
+        """
+        clear the model
+        """
+        self.__runner.clear()
+        del self.__runner
+        self.loaded = False
+
 
 class _OrtModel:
     def __init__(self, filename: str, input_size: InputSize) -> None:
+        self.reinit_with(filename, input_size)
+
+    def reinit_with(self, filename: str, input_size: InputSize) -> None:
+        try:
+            if self.loaded is True:
+                self.clear()
+        except AttributeError as e:
+            assert "has no attribute 'loaded'" in str(e)
+            pass
         self.onnx: Path = Path(os.path.splitext(filename)[0] + ".onnx")
         self.input_size: InputSize = input_size
         if not self.onnx.exists():
             raise FileNotFoundError("Onnx model file not found")
+        self.loaded: bool = False
 
     def load(self):
         """
         load the model file and set backend
         """
         self.__runner = ort.InferenceSession(str(self.onnx.absolute()))
+        self.loaded = True
 
     def __preprocess(self, frame: Image) -> Array:
         self.pps_params: MLPreprocessParams = preprocess_params_gen(
@@ -142,6 +191,7 @@ class _OrtModel:
         """
         run inference on the given frame
         """
+        assert self.loaded is True
         tensor_in: Array = self.__preprocess(frame)
         mat1, mat2, mat3 = self.__runner.run(
             ["output0", "output1", "output2"], {"images": tensor_in}
@@ -149,6 +199,13 @@ class _OrtModel:
         outputs = (np.array(mat1), np.array(mat2), np.array(mat3))
         results = post_process(outputs, self.pps_params, conf_thres, nms_thres)
         return results
+
+    def clear(self):
+        """
+        clear the model
+        """
+        del self.__runner
+        self.loaded = False
 
 
 class Model:
@@ -167,3 +224,10 @@ class Model:
         self, frame: Image, conf_thres: float = 0.25, nms_thres: float = 0.65
     ) -> list[ObjDetected]:
         return self.model.infer(frame, conf_thres, nms_thres)
+
+    def clear(self):
+        self.model.clear()
+
+    def reinit(self, filename: str, input_size: InputSize):
+        self.model.reinit_with(filename, input_size)
+        self.model.load()
