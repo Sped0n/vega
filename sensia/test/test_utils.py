@@ -1,8 +1,16 @@
-import os
+# incase pyrealsense2 fucked up
+try:
+    import pyrealsense2 as rs
+
+    assert str(rs.__version__) == "2.50.0"
+except AttributeError:
+    import pyrealsense2.pyrealsense2 as rs
+
+    assert str(rs.__version__) == "2.50.0"
+
+import platform
 from itertools import count
 from warnings import warn
-
-import pyrealsense2 as rs
 
 from ctyper import FetchError, DeviceInitError
 from sensia import D435
@@ -56,8 +64,8 @@ def test_d435_fetch_depth_only():
             h.stop()
         except RuntimeError as e:
             assert "fetch" not in str(e)
-            assert os.system == "Darwin"
+            assert platform.system() == "Darwin"
             warn("pyrs2 issue on macos")
         except DeviceInitError:
-            assert str(os.system) == "Darwin"
+            assert platform.system() == "Darwin"
             warn("pyrs2 issue on macos")
