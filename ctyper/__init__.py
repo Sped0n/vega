@@ -8,6 +8,7 @@ Image: TypeAlias = np.ndarray
 Color: TypeAlias = tuple[int, int, int]
 Array: TypeAlias = np.ndarray
 DepthArray: TypeAlias = np.ndarray
+Number: TypeAlias = float | int
 
 
 # custom dataclass
@@ -90,4 +91,8 @@ class DeviceInitError(Exception):
 
 
 class FetchError(Exception):
+    pass
+
+
+class NotFoundError(Exception):
     pass
