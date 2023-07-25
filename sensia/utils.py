@@ -1,9 +1,17 @@
+# incase pyrealsense2 fucked up
+try:
+    import pyrealsense2 as rs
+
+    assert str(rs.__version__) == "2.50.0"
+except AttributeError:
+    import pyrealsense2.pyrealsense2 as rs
+
+    assert str(rs.__version__) == "2.50.0"
+
 import dataclasses
 import math
 
-import pyrealsense2 as rs
-
-from ctyper import NoDeviceError, DepthArray, Image
+from ctyper import DepthArray, Image, NoDeviceError
 
 
 @dataclasses.dataclass

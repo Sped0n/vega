@@ -1,18 +1,20 @@
 # incase pyrealsense2 fucked up
-# try:
-#     import pyrealsense2 as rs
-#
-#     assert rs.__version__ == "2.50.0"
-# except AttributeError:
-#     import pyrealsense2.pyrealsense2 as rs
+try:
+    import pyrealsense2 as rs
 
-import numpy as np
-import pyrealsense2 as rs
+    assert str(rs.__version__) == "2.50.0"
+except AttributeError:
+    import pyrealsense2.pyrealsense2 as rs
+
+    assert str(rs.__version__) == "2.50.0"
+
 from typing import Callable
 
-from ctyper import DeviceInitError, NoDeviceError, FetchError
+import numpy as np
 
-from .utils import PoseData, pose_data_process, rs_device_init, DCData
+from ctyper import DeviceInitError, FetchError, NoDeviceError
+
+from .utils import DCData, PoseData, pose_data_process, rs_device_init
 
 
 class T265:
