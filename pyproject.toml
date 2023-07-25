@@ -25,9 +25,9 @@ addopts = [
 ]
 
 [tool.coverage.run]
-include = ["ml/*", "sensia/*"]
+include = ["ml/*", "sensia/*", "vega/*", "vision/*"]
 relative_files = true
 
 [tool.coverage.report]
-include = ["ml/*", "sensia/*"]
+include = ["ml/*", "sensia/*", "vega/*", "vision/*"]
 omit = ["*/test*"]
