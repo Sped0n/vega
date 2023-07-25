@@ -1,8 +1,8 @@
-from core.runners import toy_prototype
+from core.basic.vgcore import toy_prototype
 from multiprocessing import Queue as mQueue
 from multiprocessing import Process
-from core.vgcore import basic as vg_basic
-from core.sensiacore import basic as sensia_basic
+from core.TI22.vgcore import basic as vg_basic
+from core.TI22.sensiacore import basic as sensia_basic
 
 
 def test_toy_prototype():
