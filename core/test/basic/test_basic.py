@@ -1,8 +1,10 @@
-from core.basic.vgcore import toy_prototype
-from multiprocessing import Queue as mQueue
 from multiprocessing import Process
-from core.TI22.vgcore import basic as vg_basic
-from core.TI22.sensiacore import basic as sensia_basic
+from multiprocessing import Queue as mQueue
+from time import time
+
+from core.basic.sensiacore import basic as sensia_basic
+from core.basic.vgcore import basic as vg_basic
+from core.basic.vgcore import toy_prototype
 
 
 def test_toy_prototype():
@@ -13,19 +15,18 @@ def test_basic():
     pq = mQueue(5)
     sc = Process(
         target=sensia_basic,
-        args=(
-            pq,
-            True,
-        ),
+        args=(pq,),
     )
     vc = Process(
         target=vg_basic,
-        args=(
-            pq,
-            True,
-        ),
+        args=(pq,),
     )
     sc.start()
     vc.start()
-    sc.join()
-    vc.join()
+
+    start = time()
+    while time() - start < 5:
+        pass
+
+    sc.kill()
+    vc.kill()
