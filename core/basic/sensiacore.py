@@ -1,9 +1,9 @@
+from multiprocessing import Queue as mQueue
 from threading import Thread
 from time import sleep
-from sensia import T265
-from multiprocessing import Queue as mQueue
-from itertools import count
+
 from core.utils import flush_queue
+from sensia import T265
 
 
 class basic:
