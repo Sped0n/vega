@@ -16,13 +16,7 @@ venvPath = "/Users/spedon/anaconda3/envs/drone2023/"
 venv = "drone2023"
 
 [tool.pytest.ini_options]
-addopts = [
-  "-s",
-  "--import-mode=importlib",
-  "--doctest-modules",
-  "--cache-clear",
-  "--cov",
-]
+addopts = ["-s", "--import-mode=importlib", "--doctest-modules", "--cov"]
 
 [tool.coverage.run]
 include = ["ml/*", "sensia/*", "vega/*", "vision/*"]
