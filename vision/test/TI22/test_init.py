@@ -34,9 +34,10 @@ def test_plane_detect_hulaloop_with_valid_result():
         frame = res.visual_debug
         if VDBG:
             cv2.imshow("valid hula", frame)
-            cv2.waitKey(1000)
+            cv2.waitKey(1500)
         else:
             assert frame.shape == (20, 160, 3)
+        cv2.destroyAllWindows()
 
 
 def test_plane_detect_hulaloop_visual_debug():
