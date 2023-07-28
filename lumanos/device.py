@@ -9,12 +9,12 @@ from luma.oled.device import ssd1306
 class Mocker(capture):
     def __init__(
         self,
-        width=128,
-        height=64,
-        rotate=0,
-        mode="RGB",
-        transform="scale2x",
-        scale=2,
+        width: int = 128,
+        height: int = 64,
+        rotate: int = 0,
+        mode: str = "RGB",
+        transform: str = "scale2x",
+        scale: int = 2,
         dbg_queue: Queue | None = None,
     ):
         super(capture, self).__init__(width, height, rotate, mode, transform, scale)
