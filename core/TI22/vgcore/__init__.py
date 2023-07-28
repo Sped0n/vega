@@ -38,7 +38,7 @@ class proc:
             tmp = self.tx_queue.get()
 
             # simulate tx
-            print(tmp)
+            # print(tmp)
             # check the data type
             assert len(tmp) == 3
             assert isinstance(tmp[0], int)

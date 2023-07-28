@@ -1,9 +1,9 @@
 from itertools import count
 from multiprocessing import Queue as mQueue
-from threading import Lock, Thread
+from threading import Event, Thread
 from time import sleep
 
-from core.utils import flush_queue
+from core.utils import flush_queue, set_thread_event
 from ctyper import FetchError
 from sensia import D435, T265
 from sensia.utils import plane_radar_filter
@@ -27,16 +27,17 @@ class proc:
         self.vega2sensia_queue = vega2sensia_queue
 
         # default enable options
-        self.depth_enable = False
-        self.pose_enable = True
+        self.depth_enable: Event = Event()
+        self.depth_enable.clear()  # default disable
+        self.pose_enable: Event = Event()
+        self.pose_enable.set()  # default enable
 
         # run it
         self.run()
 
     def pose_core(self):
         while True:
-            if self.pose_enable is not True:
-                continue
+            self.pose_enable.wait()
 
             # will put in if not full, so we won't get blocking by the queue put func,
             # and always put the latest frame into queue
@@ -46,8 +47,7 @@ class proc:
 
     def depth_core(self):
         while True:
-            if self.depth_enable is not True:
-                continue
+            self.depth_enable.wait()
 
             attempts = count()
             # retry if fetch failed
@@ -71,9 +71,8 @@ class proc:
         while True:
             cmd: dict[str, bool] = self.vega2sensia_queue.get()
             try:
-                if cmd["depth"] != self.depth_enable:
-                    with Lock():
-                        self.depth_enable = cmd["depth"]
+                if cmd["depth"] != self.depth_enable.is_set():
+                    set_thread_event(self.depth_enable, cmd["depth"])
             except KeyError:
                 pass
 
