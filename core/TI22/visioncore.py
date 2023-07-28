@@ -38,7 +38,7 @@ class proc:
 
             # data process
             res = plane_detect_hulaloop(depth)
-            if res.valid is True:
+            if res.res_valid is True:
                 if self.hula2vega_queue.full() is True:
                     flush_queue(self.hula2vega_queue)
                 self.hula2vega_queue.put(res.x_and_angle_differ)

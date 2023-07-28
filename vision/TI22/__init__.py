@@ -1,9 +1,10 @@
+from copy import deepcopy
 import cv2
 import numpy as np
 
-from ctyper import Array, Image, NotFoundError, Number
+from ctyper import Array, Image, MatNotValid, NotFoundError, Number
 
-from .utils import array2image, close_op, open_op, simple_dilate, HulaROI, p2p_distance
+from .utils import HulaROI, array2image, close_op, open_op, p2p_distance, simple_dilate
 
 
 class plane_detect_hulaloop:
@@ -11,15 +12,19 @@ class plane_detect_hulaloop:
         """
         detect hula loop in plane scan
         """
+        try:
+            assert src.shape == (92, 160)
+        except AssertionError:
+            raise MatNotValid("Input array shape is not (92, 160)")
         # get the center slice of depth array
         mid: Array = src[33:53]
         # filter the depth value
         mid = np.where(np.logical_and(mid <= 1800, mid >= 300), mid, 0)
         # convert to image in favor of opencv
-        self.disp: Image = array2image(mid, 1900)
+        self.__disp: Image = array2image(mid, 1900)
 
         # perform open operation, eliminate noise pixel
-        mid_image = open_op(self.disp, (3, 3))
+        mid_image = open_op(self.__disp, (3, 3))
         # perform close operation with vertical kernel, fill the vertical gap
         mid_image = open_op(mid_image, (1, 10))
         # perform close operation with horizontal kernel, fill the horizontal gap
@@ -43,6 +48,8 @@ class plane_detect_hulaloop:
         )
 
         raw_results: list[HulaROI] = []
+
+        self.res_valid: bool = False
 
         for cnt in raw_cnts:
             x, y, w, h = cv2.boundingRect(cnt)
@@ -76,7 +83,7 @@ class plane_detect_hulaloop:
                 HulaROI(0, 0, x, y, w, h, angle, float(np.average(roi_valid)))
             )
 
-        self.results: list[HulaROI] = []
+        self.__results: list[HulaROI] = []
         # over 2 results, abandon
         if len(raw_results) != 2:
             return None
@@ -88,32 +95,26 @@ class plane_detect_hulaloop:
             result.x = result.distance * np.sin((result.angle / 180) * np.pi)
 
         # or if we have 2 results, but the distance between them is too large, abandon
-        if 730 <= (
+        if 700 <= (
             p2p_distance(
                 raw_results[0].x, raw_results[1].x, raw_results[0].y, raw_results[1].y
             )
-            <= 930
+            <= 1000
         ):
             return None
+        self.res_valid = True
         for result in raw_results:
-            self.results.append(result)
-
-    @property
-    def valid(self) -> bool:
-        """
-        return the validity of results
-        """
-        return len(self.results) == 2
+            self.__results.append(result)
 
     @property
     def x_and_angle_differ(self) -> tuple[int, int]:
         """
         return the difference of x and angle
         """
-        if len(self.results) != 2:
+        if self.res_valid is False:
             raise NotFoundError("No result found")
-        plane_differ_slope = (self.results[0].y - self.results[1].y) / (
-            self.results[0].x - self.results[1].x
+        plane_differ_slope = (self.__results[0].y - self.__results[1].y) / (
+            self.__results[0].x - self.__results[1].x
         )
         cx, cy = self.cx_and_cy
         x_differ = int(cx + plane_differ_slope * cy)
@@ -126,24 +127,24 @@ class plane_detect_hulaloop:
 
     @property
     def cx_and_cy(self) -> tuple[Number, Number]:
-        if len(self.results) != 2:
+        if self.res_valid is False:
             raise NotFoundError("No result found")
-        cx = (self.results[0].x + self.results[1].x) / 2
-        cy = (self.results[0].y + self.results[1].y) / 2
+        cx = (self.__results[0].x + self.__results[1].x) / 2
+        cy = (self.__results[0].y + self.__results[1].y) / 2
         return cx, cy
 
     @property
     def visual_debug(self) -> Image:
-        self.disp = cv2.cvtColor(self.disp, cv2.COLOR_GRAY2BGR)
+        self.__disp = cv2.cvtColor(self.__disp, cv2.COLOR_GRAY2BGR)
         # if self.results not valid, return the original image
-        if len(self.results) != 2:
-            return self.disp
-        for result in self.results:
+        if self.res_valid is False:
+            return self.__disp
+        for result in self.__results:
             cv2.rectangle(
-                self.disp,
-                (result.bx, result.by),
-                (result.bx + result.bw, result.by + result.bh),
+                self.__disp,
+                (result.bx, min(result.by - 5, 158)),
+                (result.bx + result.bw, min(result.by + result.bh - 5, 158)),
                 (0, 255, 0),
                 1,
             )
-        return self.disp
+        return self.__disp
