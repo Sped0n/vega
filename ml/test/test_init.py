@@ -2,13 +2,14 @@ from pathlib import Path
 
 import cv2
 
+from cfg import VDBG, colors_80
 from ctyper import InputSize, ObjDetected
 from ml import Model
 
 TEST_DATA_DIR = str(Path(__file__).resolve().parent / "data") + "/"
 
 
-def infer_validator(res: list[ObjDetected]):
+def infer_validator_v8n_bus(res: list[ObjDetected]):
     # only for bus.jpg!!!
     expected = [
         (146, 650, 0.7, 0),
@@ -73,16 +74,39 @@ def test_onnx_infer_valid():
     isize = InputSize(416, 416)
     model = Model(TEST_DATA_DIR + "test", isize, "ort")
     frame = cv2.imread(TEST_DATA_DIR + "bus.jpg")
-    infer_validator(model.infer(frame, conf_thres=0.25, nms_thres=0.65))
+    results = model.infer(frame, conf_thres=0.25, nms_thres=0.65)
+    infer_validator_v8n_bus(results)
+    if VDBG:
+        for result in results:
+            color = colors_80[result.clsid]
+            cv2.rectangle(
+                frame,
+                (result.box.x0, result.box.y0),
+                (result.box.x1, result.box.y1),
+                color,
+                2,
+            )
+            cv2.putText(
+                frame,
+                f"{result.clsid}: {result.score:.2f}",
+                (result.box.x0, result.box.y0 - 5),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.5,
+                color,
+                2,
+            )
+        cv2.imshow("onnx_infer_bus", frame)
+        cv2.waitKey(4000)
+        cv2.destroyAllWindows()
 
 
 def test_onnx_reinit():
     isize = InputSize(416, 416)
     model = Model(TEST_DATA_DIR + "test", isize, "ort")
     frame = cv2.imread(TEST_DATA_DIR + "bus.jpg")
-    infer_validator(model.infer(frame, conf_thres=0.25, nms_thres=0.65))
+    infer_validator_v8n_bus(model.infer(frame, conf_thres=0.25, nms_thres=0.65))
     model.reinit(TEST_DATA_DIR + "test.onnx", isize)
-    infer_validator(model.infer(frame, conf_thres=0.25, nms_thres=0.65))
+    infer_validator_v8n_bus(model.infer(frame, conf_thres=0.25, nms_thres=0.65))
 
 
 # ncnn test
@@ -121,13 +145,36 @@ def test_ncnn_infer_valid():
     isize = InputSize(416, 416)
     model = Model(TEST_DATA_DIR + "test", isize, "ncnn")
     frame = cv2.imread(TEST_DATA_DIR + "bus.jpg")
-    infer_validator(model.infer(frame, conf_thres=0.25, nms_thres=0.65))
+    results = model.infer(frame, conf_thres=0.25, nms_thres=0.65)
+    infer_validator_v8n_bus(results)
+    if VDBG:
+        for result in results:
+            color = colors_80[result.clsid]
+            cv2.rectangle(
+                frame,
+                (result.box.x0, result.box.y0),
+                (result.box.x1, result.box.y1),
+                color,
+                2,
+            )
+            cv2.putText(
+                frame,
+                f"{result.clsid}: {result.score:.2f}",
+                (result.box.x0, result.box.y0 - 5),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.5,
+                color,
+                2,
+            )
+        cv2.imshow("ncnn_infer_bus", frame)
+        cv2.waitKey(4000)
+        cv2.destroyAllWindows()
 
 
 def test_ncnn_reinit():
     isize = InputSize(416, 416)
     model = Model(TEST_DATA_DIR + "test", isize, "ncnn")
     frame = cv2.imread(TEST_DATA_DIR + "bus.jpg")
-    infer_validator(model.infer(frame, conf_thres=0.25, nms_thres=0.65))
+    infer_validator_v8n_bus(model.infer(frame, conf_thres=0.25, nms_thres=0.65))
     model.reinit(TEST_DATA_DIR + "test.bin", isize)
-    infer_validator(model.infer(frame, conf_thres=0.25, nms_thres=0.65))
+    infer_validator_v8n_bus(model.infer(frame, conf_thres=0.25, nms_thres=0.65))
