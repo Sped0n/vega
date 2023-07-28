@@ -51,7 +51,7 @@ def test_ti22():
 
     start = time()
 
-    while time() - start < 15:
+    while time() - start < 10:
         pass
 
     cp.kill()

@@ -25,7 +25,7 @@ def test_basic():
     vc.start()
 
     start = time()
-    while time() - start < 5:
+    while time() - start < 3:
         pass
 
     sc.kill()
