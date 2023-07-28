@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from multiprocessing import Queue as mQueue
-from queue import Queue
+from queue import Empty, Queue
+from threading import Event
 
 from ctyper import Number
 
@@ -16,6 +17,16 @@ class Target:
         self.yaw = yaw
 
 
-def flush_queue(queue: Queue | mQueue):
+def flush_queue(queue: Queue | mQueue, timeout: float = 0.2):
     while not queue.empty():
-        queue.get()
+        try:
+            queue.get(timeout=timeout)
+        except Empty:
+            pass
+
+
+def set_thread_event(e: Event, status: bool):
+    if status is True:
+        e.set()
+    else:
+        e.clear()
