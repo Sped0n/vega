@@ -1,7 +1,6 @@
 from pathlib import Path
 
 import cv2
-from objprint import op
 
 from ctyper import InputSize, ObjDetected
 from ml import Model
