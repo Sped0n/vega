@@ -7,7 +7,9 @@ from .utils import HulaROI, array2image, close_op, open_op, p2p_distance, simple
 
 
 class plane_detect_hulaloop:
-    def __init__(self, src: Array) -> None:
+    def __init__(
+        self, src: Array, diameter_range: tuple[int, int] = (700, 1000)
+    ) -> None:
         """
         detect hula loop in plane scan
         """
@@ -94,11 +96,11 @@ class plane_detect_hulaloop:
             result.x = result.distance * np.sin((result.angle / 180) * np.pi)
 
         # or if we have 2 results, but the distance between them is too large, abandon
-        if 700 <= (
+        if min(diameter_range) <= (
             p2p_distance(
                 raw_results[0].x, raw_results[1].x, raw_results[0].y, raw_results[1].y
             )
-            <= 1000
+            <= max(diameter_range)
         ):
             return None
         self.res_valid = True
