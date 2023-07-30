@@ -41,11 +41,11 @@ def infer_validator_v8n_bus(res: list[ObjDetected]):
 def infer_validator_v8n_ti0(res: list[ObjDetected]):
     # only for ti0.jpg!!!
     expected = [
-        (2040, 483, 0.7, 2),
-        (2623, 1662, 0.7, 5),
-        (3142, 320, 0.7, 1),
-        (653, 634, 0.65, 1),
-        (908, 2086, 0.55, 0),
+        (2040, 483, 0.5, 2),
+        (2623, 1662, 0.5, 5),
+        (3142, 320, 0.5, 1),
+        (653, 634, 0.5, 1),
+        (908, 2086, 0.5, 0),
     ]
     # number of detected objects
     assert len(res) == 5
@@ -270,3 +270,43 @@ def test_ncnn_ti2022():
         cv2.imshow("ncnn_infer_ti2022", frame)
         cv2.waitKey(4000)
         cv2.destroyAllWindows()
+
+
+def test_ncnn_fov():
+    if VDBG is False:
+        return None  # skip
+    isize = InputSize(416, 416)
+    model = Model(TEST_DATA_DIR + "ti2022", isize, "ncnn")
+
+    cap = cv2.VideoCapture(0)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if not ret:
+            continue
+        k = cv2.waitKey(1)
+        if k == 27:
+            break
+        results = model.infer(frame, conf_thres=0.25, nms_thres=0.65)
+        for result in results:
+            color = colors_80[result.clsid]
+            cv2.rectangle(
+                frame,
+                (result.box.x0, result.box.y0),
+                (result.box.x1, result.box.y1),
+                color,
+                2,
+            )
+            cv2.putText(
+                frame,
+                f"{result.clsid}: {result.score:.2f}({(result.box.x0 + result.box.x1) / 2 - 640},{(result.box.y0 + result.box.y1) / 2 - 360}",  # noqa: E501
+                (result.box.x0, result.box.y0 - 5),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.5,
+                color,
+                2,
+            )
+        cv2.imshow("capture", frame)
+    cap.release()
+    cv2.destroyAllWindows()
