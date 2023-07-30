@@ -28,7 +28,7 @@ if len(rs.context().query_devices()) == 0:
     warn("no realsense device, skipping test")
     NORS = True  # force NORS if no device connected
 
-
+# random color for object detection display
 colors_80: list[Color] = [
     tuple([random.randint(0, 255) for _ in range(3)]) for _ in range(80)
 ]
