@@ -1,6 +1,6 @@
 from multiprocessing import Process
 from multiprocessing import Queue as mQueue
-from time import time
+from time import sleep
 
 from core.basic.sensiacore import basic as sensia_basic
 from core.basic.vgcore import basic as vg_basic
@@ -24,9 +24,7 @@ def test_basic():
     sc.start()
     vc.start()
 
-    start = time()
-    while time() - start < 3:
-        pass
+    sleep(3)
 
     sc.kill()
     vc.kill()
