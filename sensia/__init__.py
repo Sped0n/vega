@@ -1,18 +1,10 @@
-# incase pyrealsense2 fucked up
-try:
-    import pyrealsense2 as rs
-
-    assert str(rs.__version__) == "2.50.0"
-except AttributeError:
-    import pyrealsense2.pyrealsense2 as rs
-
-    assert str(rs.__version__) == "2.50.0"
-
 from typing import Callable
 
+import cv2
 import numpy as np
 
-from ctyper import DeviceInitError, FetchError, NoDeviceError
+from ctyper import DeviceInitError, FetchError, NoDeviceError, Image
+from cfg import rs
 
 from .utils import DCData, PoseData, pose_data_process, rs_device_init
 
@@ -106,3 +98,34 @@ class D435:
     def restart(self) -> None:
         self.stop()
         self.pipe.start(self.cfg)
+
+
+class AsyncCam:
+    def __init__(self, width: int, height: int, id: int = 0) -> None:
+        self.reinit_with(width, height, id)
+
+    def fetch(self) -> Image:
+        ret, frame = self.cap.read()
+        if not ret:
+            raise FetchError("AsyncCam fetch failed")
+        return frame
+
+    def stop(self) -> None:
+        try:
+            self.cap.release()
+            del self.cap
+        except AttributeError:
+            pass
+
+    def reinit_with(self, width: int, height: int, id: int = 0) -> None:
+        self.stop()
+        self.device_id = id
+        try:
+            self.cap = cv2.VideoCapture(self.device_id)
+        except cv2.error:
+            raise DeviceInitError("AsyncCam init failed")
+        self.width = width
+        self.height = height
+
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.width)
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.height)
