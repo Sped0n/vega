@@ -36,6 +36,8 @@ class DCData:
 def rs_device_init(needed_cam_info: str) -> tuple[rs.pipeline, rs.config]:
     """
     init realsense device and return rs pipeline and config
+    :param needed_cam_info: realsense camera info
+    :return: realsense pipeline and realsense config
     """
     ctx = rs.context()
     if len(ctx.query_devices()) == 0:
@@ -56,6 +58,11 @@ def rs_device_init(needed_cam_info: str) -> tuple[rs.pipeline, rs.config]:
 
 
 def pose_data_process(data: rs.pose) -> PoseData:
+    """
+    process pose data and return a PoseData object
+    :param data: T265 pose data
+    :return: PoseData
+    """
     rw = data.rotation.w
     rx = -data.rotation.z
     ry = data.rotation.x
@@ -85,6 +92,8 @@ def pose_data_process(data: rs.pose) -> PoseData:
 def plane_radar_filter(df: rs.depth_frame) -> rs.depth_frame:
     """
     filter for plane scan
+    :param df: depth frame
+    :return: filtered depth frame
     """
     dec = rs.decimation_filter()
     dec.set_option(rs.option.filter_magnitude, 2)
@@ -103,13 +112,13 @@ def plane_radar_filter(df: rs.depth_frame) -> rs.depth_frame:
     tbf.set_option(rs.option.filter_smooth_delta, 30)
 
     # 1280x720 -> 640x368
-    temp: rs.depth_frame = dec.process(df)
-    temp = spa.process(temp)
-    temp = tbf.process(temp)
+    tmp: rs.depth_frame = dec.process(df)
+    tmp = spa.process(tmp)
+    tmp = tbf.process(tmp)
     # 640x368 -> 320x184
-    temp = dec.process(temp)
+    tmp = dec.process(tmp)
     # 320x184 -> 160x92
-    temp = dec.process(temp)
-    temp = ths.process(temp)
+    tmp = dec.process(tmp)
+    tmp = ths.process(tmp)
 
-    return temp
+    return tmp
