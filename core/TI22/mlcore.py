@@ -6,7 +6,7 @@ from threading import Event, Thread
 from time import sleep
 
 from core.utils import get_cmd, pusher
-from ctyper import Command, Image, InputSize, ObjDetected
+from ctyper import Command, Image, InputSize
 from ml import Model
 
 DATA_DIR = str(Path(__file__).resolve().parent / "data") + "/"
