@@ -30,3 +30,27 @@ def set_thread_event(e: Event, status: bool):
         e.set()
     else:
         e.clear()
+
+
+def pusher(queue: Queue | mQueue, data: object, flush_timeout: float = 0.2):
+    """
+    push data into queue, and flush the queue if it is full
+    """
+    if queue.full() is True:
+        flush_queue(queue, flush_timeout)
+    queue.put(data)
+
+
+def get_cmd(cmd_dict: dict[str, bool], key: str, event: Event):
+    """
+    get cmd from cmd_dict, and set the event
+    :param cmd_dict: command dict
+    :param key: key for dict
+    :param event: threading event
+    """
+    try:
+        if cmd_dict[key] != event.is_set():
+            set_thread_event(event, cmd_dict[key])
+            print(f"{key} change", cmd_dict[key])
+    except KeyError:
+        pass
