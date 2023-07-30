@@ -9,6 +9,7 @@ Color: TypeAlias = tuple[int, int, int]
 Array: TypeAlias = np.ndarray
 DepthArray: TypeAlias = np.ndarray
 Number: TypeAlias = float | int
+Command: TypeAlias = dict[str, bool]
 
 
 # custom dataclass
