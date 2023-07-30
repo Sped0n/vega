@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 from multiprocessing import Queue as mQueue
 from queue import Queue
 from threading import Thread
-from time import sleep
+from time import sleep, time
 
 from objprint import op
 
@@ -15,15 +17,19 @@ class proc:
     def __init__(
         self,
         pose_queue: mQueue,  # input
-        hula2vega_queue: mQueue,  # input
+        vision2vega_queue: mQueue,  # input
+        ml2vega_queue: mQueue,  # input
         vega2vision_queue: mQueue,  # output
         vega2sensia_queue: mQueue,  # output
+        vega2ml_queue: mQueue,  # output
     ) -> None:
         # proc queue init
         self.pose_queue = pose_queue
-        self.hula2vega_queue = hula2vega_queue
+        self.vision2vega_queue = vision2vega_queue
+        self.ml2vega_queue = ml2vega_queue
         self.vega2vision_queue = vega2vision_queue
         self.vega2sensia_queue = vega2sensia_queue
+        self.vega2ml_queue = vega2ml_queue
 
         # thread queue init
         self.tx_queue = Queue(5)
@@ -67,13 +73,27 @@ class proc:
 
     def missionary(self):
         case = 0
+        count = 0
         while True:
             status = self.status_queue.get()
             match case:
                 case 0:
+                    self.vega2ml_queue.put({"ti": True})
+                    self.vega2sensia_queue.put({"cam": True})
+                    start = time()
+                    self.ml2vega_queue.get()["ti"]
+                    print("ml process fps: ", 1 / (time() - start))
+                    count += 1
+                    if count >= 60:
+                        case = 1
+                        self.vega2ml_queue.put({"ti": False})
+                        self.vega2sensia_queue.put({"cam": False})
+
+                case 1:
+                    print("case 1")
                     self.vega2sensia_queue.put({"depth": True})
                     self.vega2vision_queue.put({"hula": True})
-                    x = mission_detect_hula_loop(self.hula2vega_queue, status)
+                    x = mission_detect_hula_loop(self.vision2vega_queue, status)
                     op(x)
 
     def run(self):
