@@ -28,28 +28,29 @@ def test_pose_data_process():
 
 
 def test_d435_fetch_depth_only():
-    if NORS is False:
-        try:
-            h = D435(depth_only=True)
-            attempts = count()
-            while True:
-                try:
-                    d = h.fetch(plane_radar_filter)
-                except FetchError:
-                    h.restart()
-                    if next(attempts) <= 3:
-                        continue
-                    else:
-                        raise
-                break
-            assert d.dvalid is True
-            assert d.depth.shape == (92, 160)
-            assert d.cvalid is False
-            h.stop()
-        except RuntimeError as e:
-            assert "fetch" not in str(e)
-            assert is_darwin is True
-            warn("pyrs2 issue on macos")
-        except DeviceInitError:
-            assert is_darwin is True
-            warn("pyrs2 issue on macos")
+    if NORS is True:
+        return None
+    try:
+        h = D435(depth_only=True)
+        attempts = count()
+        while True:
+            try:
+                d = h.fetch(plane_radar_filter)
+            except FetchError:
+                h.restart()
+                if next(attempts) <= 3:
+                    continue
+                else:
+                    raise
+            break
+        assert d.dvalid is True
+        assert d.depth.shape == (92, 160)
+        assert d.cvalid is False
+        h.stop()
+    except RuntimeError as e:
+        assert "fetch" not in str(e)
+        assert is_darwin is True
+        warn("pyrs2 issue on macos")
+    except DeviceInitError:
+        assert is_darwin is True
+        warn("pyrs2 issue on macos")
