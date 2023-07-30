@@ -5,7 +5,6 @@ from lumanos.device import OLED1306, Mocker
 def test_mocker():
     if (is_arm and is_darwin) is False:
         return None
-    print("\ntesting mocker with macos")
     m = Mocker()
     m.capabilities(width=128, height=64, rotate=0, mode="1")
     assert m.width == 128
@@ -15,7 +14,6 @@ def test_mocker():
 def test_OLED1306():
     if (is_arm and is_linux) is False:
         return None
-    print("\ntesting ssd1306 with arm linux")
     o = OLED1306(port=5, address=0x3C)
     o.capabilities(width=128, height=64, rotate=0, mode="1")
     assert o.width == 128
