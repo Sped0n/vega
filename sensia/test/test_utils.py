@@ -1,26 +1,10 @@
-# incase pyrealsense2 fucked up
-try:
-    import pyrealsense2 as rs
-
-    assert str(rs.__version__) == "2.50.0"
-except AttributeError:
-    import pyrealsense2.pyrealsense2 as rs
-
-    assert str(rs.__version__) == "2.50.0"
-
-import platform
 from itertools import count
 from warnings import warn
 
-from ctyper import FetchError, DeviceInitError
+from cfg import NORS, is_darwin, rs
+from ctyper import DeviceInitError, FetchError
 from sensia import D435
 from sensia.utils import plane_radar_filter, pose_data_process
-
-ctx = rs.context()
-no_device = False
-if len(ctx.query_devices()) == 0:
-    warn("no device, skipping test")
-    no_device = True
 
 
 def test_pose_data_process():
@@ -44,7 +28,7 @@ def test_pose_data_process():
 
 
 def test_d435_fetch_depth_only():
-    if not no_device:
+    if NORS is False:
         try:
             h = D435(depth_only=True)
             attempts = count()
@@ -64,8 +48,8 @@ def test_d435_fetch_depth_only():
             h.stop()
         except RuntimeError as e:
             assert "fetch" not in str(e)
-            assert platform.system() == "Darwin"
+            assert is_darwin is True
             warn("pyrs2 issue on macos")
         except DeviceInitError:
-            assert platform.system() == "Darwin"
+            assert is_darwin is True
             warn("pyrs2 issue on macos")
