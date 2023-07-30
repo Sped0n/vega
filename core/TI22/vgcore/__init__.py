@@ -7,7 +7,7 @@ from time import sleep, time
 
 from objprint import op
 
-from core.utils import Target, flush_queue
+from core.utils import Target, flush_queue, set_cmd
 from sensia.utils import PoseData
 
 from .missions import mission_detect_hula_loop
@@ -78,21 +78,21 @@ class proc:
             status = self.status_queue.get()
             match case:
                 case 0:
-                    self.vega2ml_queue.put({"ti": True})
-                    self.vega2sensia_queue.put({"cam": True})
+                    set_cmd(self.vega2ml_queue, "ti", True)
+                    set_cmd(self.vega2sensia_queue, "cam", True)
                     start = time()
                     self.ml2vega_queue.get()["ti"]
                     print("ml process fps: ", 1 / (time() - start))
                     count += 1
                     if count >= 60:
                         case = 1
-                        self.vega2ml_queue.put({"ti": False})
-                        self.vega2sensia_queue.put({"cam": False})
+                        set_cmd(self.vega2ml_queue, "ti", False)
+                        set_cmd(self.vega2sensia_queue, "cam", False)
 
                 case 1:
                     print("case 1")
-                    self.vega2sensia_queue.put({"depth": True})
-                    self.vega2vision_queue.put({"hula": True})
+                    set_cmd(self.vega2sensia_queue, "depth", True)
+                    set_cmd(self.vega2vision_queue, "hula", True)
                     x = mission_detect_hula_loop(self.vision2vega_queue, status)
                     op(x)
 
