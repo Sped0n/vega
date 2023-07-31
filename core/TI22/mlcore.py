@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from multiprocessing import Queue as mQueue
 from pathlib import Path
+from queue import Empty
 from threading import Event, Thread
 from time import sleep
 
@@ -39,7 +40,10 @@ class proc:
             self.ti_enable.wait()
 
             # data fetch
-            frame = self.cam_queue.get()
+            try:
+                frame = self.cam_queue.get(timeout=3)
+            except Empty:
+                continue
 
             # data process
             results = self.ti.infer(frame)

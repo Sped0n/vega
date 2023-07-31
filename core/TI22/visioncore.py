@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from multiprocessing import Queue as mQueue
+from queue import Empty
 from threading import Event, Thread
 from time import sleep
 
@@ -32,7 +33,10 @@ class proc:
             self.hula_enable.wait()
 
             # data fetch
-            depth = self.depth_queue.get()
+            try:
+                depth = self.depth_queue.get(timeout=3)
+            except Empty:
+                continue
 
             # data process
             res = plane_detect_hulaloop(depth)
