@@ -7,6 +7,7 @@ except AttributeError:
 
     assert "2." in str(rs.__version__)
 
+import multiprocessing
 import os
 import platform
 import random
@@ -32,3 +33,9 @@ if len(rs.context().query_devices()) == 0:
 colors_80: list[Color] = [
     tuple([random.randint(0, 255) for _ in range(3)]) for _ in range(80)
 ]
+
+# set global spawn mode
+try:
+    multiprocessing.set_start_method("spawn")
+except RuntimeError:
+    pass
