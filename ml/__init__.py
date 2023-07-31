@@ -179,7 +179,7 @@ class _OrtModel:
             cv2.BORDER_CONSTANT,
             0.0,
         )
-        tensor: Array = np.array(padded_frame) / 255.0
+        tensor: Array = np.array(padded_frame) / 255.0  # type: ignore
         tensor = np.transpose(tensor, (2, 0, 1))
         tensor = np.expand_dims(tensor, axis=0).astype(np.float32)
         return tensor

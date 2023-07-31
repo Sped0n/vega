@@ -78,10 +78,10 @@ class plane_detect_hulaloop:
                 int(len(roi_valid) * 0.15) : int(len(roi_valid) * 0.85)
             ]
             # filter based on roi variance
-            if not 1 <= np.var(roi_valid) <= 200:
+            if not 1 <= np.var(roi_valid) <= 200:  # type: ignore
                 continue
             raw_results.append(
-                HulaROI(0, 0, x, y, w, h, angle, float(np.average(roi_valid)))
+                HulaROI(0, 0, x, y, w, h, angle, float(np.average(roi_valid)))  # type: ignore  # noqa: E501
             )
 
         self.__results: list[HulaROI] = []
