@@ -9,19 +9,17 @@ except AttributeError:
     assert str(rs.__version__) == "2.50.0"
 
 import dataclasses
-import math
+import numpy as np
 
 from ctyper import DepthArray, Image, NoDeviceError
 
 
 @dataclasses.dataclass
 class PoseData:
-    x: float
-    y: float
-    z: float
-    pitch: float
-    roll: float
-    yaw: float
+    x: int
+    y: int
+    z: int
+    yaw: int
     confidence: int
 
 
@@ -68,25 +66,22 @@ def pose_data_process(data: rs.pose) -> PoseData:
     ry = data.rotation.x
     rz = -data.rotation.y
 
-    pitch = float(-math.asin(2.0 * (rx * rz - rw * ry)) * 180.0 / math.pi)
-    roll = float(
-        math.atan2(2.0 * (rw * rx + ry * rz), rw * rw - rx * rx - ry * ry + rz * rz)
+    yaw = int(
+        np.arctan2(2.0 * (rw * rz + rx * ry), rw * rw + rx * rx - ry * ry - rz * rz)
         * 180.0
-        / math.pi
-    )
-    yaw = float(
-        math.atan2(2.0 * (rw * rz + rx * ry), rw * rw + rx * rx - ry * ry - rz * rz)
-        * 180.0
-        / math.pi
+        / np.pi
     )
 
-    x = data.translation.x
-    y = data.translation.y
-    z = data.translation.z
+    # forward is positive x
+    x = -int(data.translation.z * 1000)
+    # left is positive y
+    y = -int(data.translation.x * 1000)
+    # up is positive z
+    z = int(data.translation.y * 1000)
 
     confidence = data.tracker_confidence
 
-    return PoseData(x, y, z, pitch, roll, yaw, confidence)
+    return PoseData(x, y, z, yaw, confidence)
 
 
 def plane_radar_filter(df: rs.depth_frame) -> rs.depth_frame:

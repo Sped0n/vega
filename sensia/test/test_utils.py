@@ -18,12 +18,10 @@ def test_pose_data_process():
     data.rotation.z = 0.5
     data.tracker_confidence = 0
     d = pose_data_process(data)
-    assert d.x == 1.0
-    assert d.y == 2.0
-    assert d.z == 3.0
-    assert d.pitch == 0.0
-    assert d.roll == -90.0
-    assert d.yaw == -90.0
+    assert d.x == -3000
+    assert d.y == -1000
+    assert d.z == 2000
+    assert d.yaw == -90
     assert d.confidence == 0
 
 

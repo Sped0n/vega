@@ -7,10 +7,9 @@ from time import sleep, time
 
 from objprint import op
 
-from core.utils import Target, flush_queue, set_cmd
+from core.utils import DroneInfo, flush_queue, set_cmd
 from sensia.utils import PoseData
-
-from .missions import mission_detect_hula_loop
+from pin import create_uart_buf
 
 
 class proc:
@@ -33,43 +32,40 @@ class proc:
 
         # thread queue init
         self.tx_queue = Queue(5)
-        self.status_queue = Queue(3)
+        self.status_queue: Queue[DroneInfo] = Queue(3)
+        self.target_array: Queue[DroneInfo] = Queue(3)
 
         # run it
         self.run()
 
     def tx(self):
+        curr_target = DroneInfo(0, 0, 0, 0)
         while True:
-            # src is not empty
-            tmp = self.tx_queue.get()
+            curr_pos = self.tx_queue.get()
+            # refresh target
+            if self.target_array.empty is False:
+                curr_target = self.target_array.get()
+            # create uart buf
+            tmp = create_uart_buf(current=curr_pos, target=curr_target, land=False)
 
             # simulate tx
             # print(tmp)
             # check the data type
-            assert len(tmp) == 3
-            assert isinstance(tmp[0], int)
-            assert isinstance(tmp[1], int)
-            assert isinstance(tmp[2], int)
+            print(tmp)
 
     def pose_handler(self):
         while True:
             # get data from queue
             pose: PoseData = self.pose_queue.get()
 
-            # tx
-            tmp = [
-                int(pose.roll),
-                int(pose.pitch),
-                int(pose.yaw),
-            ]  # simulate the data processing
             if self.tx_queue.full() is True:
                 flush_queue(self.tx_queue)
-            self.tx_queue.put(tmp)
+            self.tx_queue.put(pose)
 
             # status
             if self.status_queue.full() is True:
                 flush_queue(self.status_queue)
-            self.status_queue.put(Target(pose.x, pose.y, pose.z, pose.yaw))
+            self.status_queue.put(DroneInfo(pose.x, pose.y, pose.z, pose.yaw))
 
     def missionary(self):
         case = 0
@@ -93,7 +89,7 @@ class proc:
                     print("case 1")
                     set_cmd(self.vega2sensia_queue, "depth", True)
                     set_cmd(self.vega2vision_queue, "hula", True)
-                    x = mission_detect_hula_loop(self.vision2vega_queue, status)
+                    x = self.vision2vega_queue.get()["hula"]
                     op(x)
 
     def run(self):

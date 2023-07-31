@@ -4,17 +4,26 @@ from multiprocessing import Queue as mQueue
 from queue import Empty, Queue
 from threading import Event
 
-from ctyper import Command, Number
+from ctyper import Command
 
 
-class Target:
-    def __init__(
-        self, x: Number = 0, y: Number = 0, z: Number = 0, yaw: Number = 0
-    ) -> None:
+class DroneInfo:
+    def __init__(self, x: int = 0, y: int = 0, z: int = 0, yaw: int = 0) -> None:
         self.x = x
         self.y = y
         self.z = z
         self.yaw = yaw
+
+    def __eq__(self, __value: DroneInfo) -> bool:
+        return (
+            self.x == __value.x
+            and self.y == __value.y
+            and self.z == __value.z
+            and self.yaw == __value.yaw
+        )
+
+    def __ne__(self, __value: DroneInfo) -> bool:
+        return not self.__eq__(__value)
 
 
 def flush_queue(queue: Queue | mQueue, timeout: float = 0.2) -> None:

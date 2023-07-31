@@ -52,7 +52,7 @@ class basic:
     def core(self):
         while True:
             data: PoseData = self.pose_queue.get()
-            tmp = [int(data.roll), int(data.pitch), int(data.yaw)]
+            tmp = [int(data.x), int(data.y), int(data.z)]
             if self.tx_queue.full():
                 flush_queue(self.tx_queue)
             self.tx_queue.put(tmp)
