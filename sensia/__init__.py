@@ -1,10 +1,12 @@
+import os
+import re
 from typing import Callable
 
 import cv2
 import numpy as np
 
-from ctyper import DeviceInitError, FetchError, NoDeviceError, Image
-from cfg import rs
+from cfg import is_linux, rs
+from ctyper import DeviceInitError, FetchError, Image, NoDeviceError
 
 from .utils import DCData, PoseData, pose_data_process, rs_device_init
 
@@ -120,8 +122,20 @@ class AsyncCam:
     def reinit_with(self, width: int, height: int, id: int = 0) -> None:
         self.stop()
         self.device_id = id
+        if self.device_id == 0 and is_linux:
+            DEFAULT_CAM_NAME = "usb-RYS_USB_Camera_200901010001-video-index0"
+            if os.path.exists(DEFAULT_CAM_NAME):
+                device_path: str = os.path.realpath(DEFAULT_CAM_NAME)
+                device_re: re.Pattern = re.compile("\/dev\/video(\d+)")  # type: ignore
+                info: re.Match[str] | None = device_re.match(device_path)
+                if info:
+                    self.device_id = int(info.group(1))
         try:
-            self.cap = cv2.VideoCapture(self.device_id)
+            if is_linux:
+                # init with v4l2
+                self.cap = cv2.VideoCapture(self.device_id, cv2.CAP_V4L2)
+            else:
+                self.cap = cv2.VideoCapture(self.device_id)
         except cv2.error:
             raise DeviceInitError("AsyncCam init failed")
         self.width = width
