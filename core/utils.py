@@ -8,11 +8,14 @@ from ctyper import Command
 
 
 class DroneInfo:
-    def __init__(self, x: int = 0, y: int = 0, z: int = 0, yaw: int = 0) -> None:
+    def __init__(
+        self, x: int = 0, y: int = 0, z: int = 0, yaw: int = 0, land: bool = False
+    ) -> None:
         self.x = x
         self.y = y
         self.z = z
         self.yaw = yaw
+        self.land = land
 
     def __eq__(self, __value: DroneInfo) -> bool:
         return (
@@ -20,6 +23,7 @@ class DroneInfo:
             and self.y == __value.y
             and self.z == __value.z
             and self.yaw == __value.yaw
+            and self.land == __value.land
         )
 
     def __ne__(self, __value: DroneInfo) -> bool:

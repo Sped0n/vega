@@ -11,6 +11,7 @@ class Scheduler:
         self,
         task_id: int,
         status_queue: Queue[DroneInfo],
+        z_queue: Queue[int],
         vision2vega_queue: mQueue,
         ml2vega_queue: mQueue,
         target_array: Queue[DroneInfo],
@@ -20,6 +21,7 @@ class Scheduler:
 
         # info queues init
         self.status_queue = status_queue
+        self.z_queue = z_queue
         self.vision2vega_queue = vision2vega_queue
         self.ml2vega_queue = ml2vega_queue
         self.target_array = target_array
@@ -57,7 +59,7 @@ class Scheduler:
                         tmp_target = DroneInfo(0, 0, 1500, 0)
                     else:
                         # is around check
-                        if is_around(self.status_queue, self.curr_target):
+                        if is_around(self.status_queue, self.z_queue, self.curr_target):
                             self.around_count += 1
                         else:
                             self.around_count = 0
