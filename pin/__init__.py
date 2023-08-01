@@ -1,49 +1,39 @@
-from core.utils import DroneInfo
-from sensia.utils import PoseData
+import serial
+from cfg import is_darwin
+from serial.tools import list_ports
+
+from ctyper import DeviceInitError
 
 
-def create_uart_buf(current: PoseData, target: DroneInfo, land: bool):
-    cx_flag = 0x02 if current.x < 0 else 0x01
-    cy_flag = 0x02 if current.y < 0 else 0x01
-    cz_flag = 0x02 if current.z < 0 else 0x01
-    cyaw_flag = 0x02 if current.yaw < 0 else 0x01
+class SerDevice:
+    def __init__(self, port: str, baudrate: int = 115200) -> None:
+        tmp: str = ""
+        if "/" not in port:
+            if is_darwin is False:
+                raise NotImplementedError(
+                    "set serial port with name is only available on macOS"
+                )
+            ports: list = list(list_ports.comports())
+            founded: bool = False
+            for p in ports:
+                if port in p.device:
+                    founded = True
+                    tmp = p.device
+                    break
+            if not founded:
+                raise DeviceInitError("serial port not found")
+        else:
+            tmp = port
+        try:
+            self.__device = serial.Serial(port=tmp, baudrate=baudrate)
+        except FileNotFoundError:
+            raise DeviceInitError("serial port not found")
 
-    tx_flag = 0x02 if target.x < 0 else 0x01
-    ty_flag = 0x02 if target.y < 0 else 0x01
-    tz_flag = 0x02 if target.z < 0 else 0x01
-    tyaw_flag = 0x02 if target.yaw < 0 else 0x01
-    landa = 0x01 if land else 0x00
+    def read_buf_to_list(self) -> list[int]:
+        buf_len: int = self.__device.in_waiting
+        if buf_len == 0:
+            return []
+        return list(self.__device.read(buf_len))
 
-    return bytearray(
-        [
-            0x55,
-            0xAA,
-            0x50,
-            0x18,  # dec 24, hex 18
-            cx_flag,
-            (abs(current.x) & 0xFF00) >> 8,
-            abs(current.x) & 0x00FF,
-            cy_flag,
-            (abs(current.y) & 0xFF00) >> 8,
-            abs(current.y) & 0x00FF,
-            cz_flag,
-            (abs(current.z) & 0xFF00) >> 8,
-            abs(current.z) & 0x00FF,
-            cyaw_flag,
-            abs(current.yaw) & 0x00FF,
-            current.confidence & 0x00FF,
-            tx_flag,
-            (abs(target.x) & 0xFF00) >> 8,
-            abs(target.x) & 0x00FF,
-            abs(ty_flag),
-            (abs(target.y) & 0xFF00) >> 8,
-            abs(target.y) & 0x00FF,
-            tz_flag,
-            (abs(target.z) & 0xFF00) >> 8,
-            abs(target.z) & 0x00FF,
-            tyaw_flag,
-            target.yaw & 0x00FF,
-            landa,
-            0xAA,
-        ]
-    )
+    def write(self, datapack: bytearray):
+        self.__device.write(datapack)
