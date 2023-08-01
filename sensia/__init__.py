@@ -143,3 +143,8 @@ class AsyncCam:
 
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.width)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.height)
+        # force MJPG
+        if is_linux:
+            self.cap.set(
+                cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc("M", "J", "P", "G")
+            )
