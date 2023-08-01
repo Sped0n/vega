@@ -5,7 +5,8 @@ from core.utils import DroneInfo
 
 
 def is_around(
-    status_Queue: Queue[DroneInfo],
+    status_queue: Queue[DroneInfo],
+    z_Queue: Queue[int],
     target: DroneInfo,
     pos_tolerance: int = 5,
     yaw_tolerance: int = 5,
@@ -25,15 +26,21 @@ def is_around(
     :param target: target
     :return: if the current status is around the target
     """
+    # get status_queue
     try:
-        status = status_Queue.get(timeout=1)
+        status = status_queue.get(timeout=1)
     except Empty:
         return False
+    try:
+        z = z_Queue.get(timeout=3)
+    except Empty:
+        return False
+    # get z_Queue
     pos_around: bool = (
         sqrt(
             (status.x - target.x) ** 2
             + (status.y - target.y) ** 2
-            + (status.z - target.z) ** 2
+            + (z - target.z) ** 2
         )
         <= pos_tolerance
     )
