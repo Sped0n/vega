@@ -97,3 +97,7 @@ class FetchError(Exception):
 
 class NotFoundError(Exception):
     pass
+
+
+class PackCorruptedError(Exception):
+    pass
