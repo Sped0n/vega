@@ -29,6 +29,10 @@ if len(rs.context().query_devices()) == 0:
     warn("no realsense device, skipping test")
     NORS = True  # force NORS if no device connected
 
+# serial mode, default true if on arm64 linux(board)
+SER: bool = is_linux and is_arm
+SER = str(os.environ.get("SER")) == "1" and os.environ.get("SER") is not None
+
 # random color for object detection display
 colors_80: list[Color] = [
     tuple([random.randint(0, 255) for _ in range(3)]) for _ in range(80)
