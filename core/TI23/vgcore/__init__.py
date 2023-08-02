@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from multiprocessing import Queue as mQueue
 from queue import Queue
-from threading import Thread
+from threading import Thread, Event
 from time import sleep, time
 from .modules import Scheduler
 
@@ -35,6 +35,10 @@ class proc:
         self.status_queue: Queue[DroneInfo] = Queue(3)
         self.target_queue: Queue[DroneInfo] = Queue(3)
         self.z_queue: Queue[int] = Queue(3)
+
+        # start flag
+        self.start = Event()
+        self.start.clear()
 
         # serial device
         if is_darwin and SER is True:
@@ -75,6 +79,7 @@ class proc:
             except PackCorruptedError:
                 continue
             # push to queue
+            self.start.set()
             print(z)
             pusher(self.z_queue, z)
 
@@ -95,6 +100,7 @@ class proc:
     def missionary(self):
         Scheduler(
             1,
+            self.start,
             self.status_queue,
             self.z_queue,
             self.vega2sensia_queue,

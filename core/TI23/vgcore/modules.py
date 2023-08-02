@@ -2,6 +2,7 @@ from __future__ import annotations
 from multiprocessing import Queue as mQueue
 from queue import Queue, Empty
 from time import sleep, time
+from threading import Event
 
 from core.utils import DroneInfo, pusher
 from compass import is_around
@@ -11,6 +12,7 @@ class Scheduler:
     def __init__(
         self,
         task_id: int,
+        start: Event,
         status_queue: Queue[DroneInfo],
         z_queue: Queue[int],
         vega2sensia_queue: mQueue,  # cmd
@@ -36,6 +38,9 @@ class Scheduler:
         self.stage: int = 0
         self.roaming: bool = True
 
+        # start
+        self.start = start
+
         # current target for comparsion
         self.curr_target: DroneInfo = DroneInfo(0, 0, 0, 0)
 
@@ -59,8 +64,8 @@ class Scheduler:
             tmp_target = DroneInfo(-1, -1, -1, -1)
             match self.stage:
                 case 0:
-                    if self.z_queue.empty is False:
-                        self.__stage_jump(1)
+                    self.start.wait()
+                    self.__stage_jump(1)
 
                 case 1:
                     # Drone takes off and hovers at the starting point
