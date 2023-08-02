@@ -15,18 +15,17 @@ class proc:
     def __init__(
         self,
         pose_queue: mQueue[PoseData],  # output
-        depth_queue: mQueue[Array],  # output
         cam_queue: mQueue[Image],  # output
         vega2sensia_queue: mQueue[Command],  # input
     ) -> None:
         # device init
-        self.t = T265()
+        sleep(0.5)
+        self.t = T265("Tracking Module")
         sleep(0.5)  # need some time to start another rs pipe
         self.c = AsyncCam(width=1280, height=720)
 
         # proc queue init
         self.pose_queue = pose_queue
-        self.depth_queue = depth_queue
         self.cam_queue = cam_queue
         self.vega2sensia_queue = vega2sensia_queue
 

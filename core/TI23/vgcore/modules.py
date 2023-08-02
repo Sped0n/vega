@@ -1,7 +1,7 @@
 from __future__ import annotations
 from multiprocessing import Queue as mQueue
 from queue import Queue, Empty
-from time import sleep
+from time import sleep, time
 
 from core.utils import DroneInfo, pusher
 from compass import is_around
@@ -51,8 +51,11 @@ class Scheduler:
         self.roaming = False
 
     def __task1(self) -> None:
+        start = time()
         while True:
-            print(self.stage)
+            if time() - start > 1:
+                print("stage: ", self.stage)
+                start = time()
             tmp_target = DroneInfo(-1, -1, -1, -1)
             match self.stage:
                 case 0:
