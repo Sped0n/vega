@@ -12,9 +12,9 @@ from .utils import DCData, PoseData, pose_data_process, rs_device_init
 
 
 class T265:
-    def __init__(self) -> None:
+    def __init__(self, device_name: str = "Stereo Module") -> None:
         try:
-            self.pipe, self.cfg = rs_device_init("Stereo Module")
+            self.pipe, self.cfg = rs_device_init(device_name)
         except NoDeviceError:
             raise DeviceInitError("T265 init failed")
         self.cfg.enable_stream(rs.stream.pose)
