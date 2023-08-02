@@ -49,6 +49,7 @@ class proc:
         self.run()
 
     def tx(self):
+        # init target
         curr_target = DroneInfo(0, 0, 0, 0, False)
         txstart = time()
         while True:
@@ -56,10 +57,10 @@ class proc:
             # refresh target if not empty
             if self.target_queue.empty is False:
                 curr_target = self.target_queue.get()
-
             if SER is True:
                 # create uart buf
                 tmp = create_uart_buf(current=curr_pos, target=curr_target)
+                # send pose and target
                 self.uart.write(tmp)
             else:
                 if time() - txstart > 1:
@@ -71,7 +72,7 @@ class proc:
             # read from uart
             if SER is False:
                 continue
-            tmp = self.uart.read_buf_to_list()
+            tmp: list[int] = self.uart.read_buf_to_list()
             try:
                 z: int = depack_recv_list_to_z(tmp)
             except PackCorruptedError:
