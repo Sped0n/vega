@@ -46,3 +46,9 @@ def is_around(
     )
     yaw_around: bool = abs(status.yaw - target.yaw) <= yaw_tolerance
     return pos_around and yaw_around
+
+
+def corrd2block(x, y):
+    x_tmp = round(x / 100 / 48 * 72)
+    y_tmp = 60 + round(y / 100 / 40 * 60)
+    return x_tmp, y_tmp

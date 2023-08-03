@@ -10,6 +10,8 @@ Array: TypeAlias = np.ndarray
 DepthArray: TypeAlias = np.ndarray
 Number: TypeAlias = float | int
 Command: TypeAlias = dict[str, bool]
+PixelOffset: TypeAlias = tuple[int, int]
+Pixel: TypeAlias = tuple[int, int]
 
 
 # custom dataclass
