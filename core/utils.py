@@ -73,7 +73,7 @@ def set_thread_event(e: Event, status: bool) -> None:
         e.clear()
 
 
-def pusher(queue: Queue | mQueue, data: object, flush_timeout: float = 0.2) -> None:
+def pusher(queue: Queue | mQueue, data: object, flush_timeout: float = 0.1) -> None:
     """
     push data into queue, and flush the queue if it is full
 
