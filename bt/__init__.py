@@ -2,6 +2,7 @@ import bluetooth
 from ctyper import ConntectionError
 import itertools
 from queue import Queue
+from time import sleep
 
 
 class BTServer:
@@ -18,12 +19,15 @@ class BTServer:
             service_classes=[self.uuid, bluetooth.SERIAL_PORT_CLASS],
             profiles=[bluetooth.SERIAL_PORT_PROFILE],
         )
+
+        self.running: bool = False
         self.__hold_for_device()
 
     def __hold_for_device(self):
         print("==> Waiting for connection on RFCOMM channel", self.port)
         self.client_sock, self.client_info = self.server_sock.accept()
         print("==> Accepted connection from", self.client_info)
+        self.running = True
 
     def __recieve(self, bytes: int = 1024) -> str:
         try:
@@ -45,7 +49,9 @@ class BTServer:
             try:
                 self.__send(send_queue.get())
             except ConntectionError:
-                self.__hold_for_device()
+                if self.running:
+                    self.running = False
+                    self.__hold_for_device()
 
     def recv_thread(self, recv_queue: Queue[str]) -> None:
         while True:
@@ -53,7 +59,9 @@ class BTServer:
                 if recv_queue.full() is False:
                     recv_queue.put(self.__recieve())
             except ConntectionError:
-                self.__hold_for_device()
+                if self.running:
+                    self.running = False
+                    self.__hold_for_device()
 
 
 class BTClient:
@@ -61,6 +69,8 @@ class BTClient:
         self.client_sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
         self.uuid = uuid
         self.addr = target_addr
+
+        self.running: bool = False
         self.__robust_connect()
 
     def __connect(self) -> None:
@@ -83,13 +93,15 @@ class BTClient:
             print("socket connect failed")
             raise ConnectionError("Couldn't connect to server")
         print("==> Connected to server")
+        self.running = True
 
-    def __robust_connect(self, max_attempts: int = 5) -> None:
+    def __robust_connect(self, max_attempts: int = 10) -> None:
         attempts = itertools.count()
         while True:
             try:
                 self.__connect()
             except ConnectionError:
+                sleep(2)
                 if next(attempts) <= max_attempts:
                     continue
                 else:
@@ -116,7 +128,9 @@ class BTClient:
             try:
                 self.__send(send_queue.get())
             except ConntectionError:
-                self.__robust_connect()
+                if self.running:
+                    self.running = False
+                    self.__robust_connect()
 
     def recv_thread(self, recv_queue: Queue[str]) -> None:
         while True:
@@ -124,4 +138,6 @@ class BTClient:
                 if recv_queue.full() is False:
                     recv_queue.put(self.__recieve())
             except ConntectionError:
-                self.__robust_connect()
+                if self.running:
+                    self.running = False
+                    self.__robust_connect()
