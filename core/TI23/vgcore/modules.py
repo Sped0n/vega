@@ -57,16 +57,15 @@ class Scheduler:
 
     def __task1(self) -> None:
         start = time()
+        tmp_target = DroneInfo(-1, -1, -1, -1)
         while True:
             if time() - start > 1:
                 print("stage: ", self.stage)
                 start = time()
-            tmp_target = DroneInfo(-1, -1, -1, -1)
             match self.stage:
                 case 0:
                     self.start.wait()
                     self.__stage_jump(1)
-
                 case 1:
                     # Drone takes off and hovers at the starting point
                     if self.roaming is False:
