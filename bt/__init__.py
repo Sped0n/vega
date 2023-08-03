@@ -33,7 +33,8 @@ class BTServer:
         try:
             data = self.client_sock.recv(bytes)  # type: ignore
         except OSError:
-            print("Server Connection lost (recv)")
+            if self.running:
+                print("Server Connection lost (recv)")
             raise ConntectionError("Server to client Connection lost")
         return data.decode()
 
@@ -41,7 +42,8 @@ class BTServer:
         try:
             self.client_sock.send(data)  # type: ignore
         except OSError:
-            print("Server Connection lost (send)")
+            if self.running:
+                print("Server Connection lost (send)")
             raise ConntectionError("Server to client Connection lost")
 
     def send_thread(self, send_queue: Queue[str]) -> None:
@@ -112,7 +114,8 @@ class BTClient:
         try:
             data = self.sock.recv(bytes)  # type: ignore
         except OSError:
-            print("Client to Server Connection lost")
+            if self.running:
+                print("Client to Server Connection lost")
             raise ConntectionError("Client Connection lost (recv)")
         return data.decode()
 
@@ -120,7 +123,8 @@ class BTClient:
         try:
             self.sock.send(data)  # type: ignore
         except OSError:
-            print("Client to Server Connection lost (send)")
+            if self.running:
+                print("Client to Server Connection lost (send)")
             raise ConntectionError("Client Connection lost")
 
     def send_thread(self, send_queue: Queue[str]) -> None:
