@@ -101,3 +101,7 @@ class NotFoundError(Exception):
 
 class PackCorruptedError(Exception):
     pass
+
+
+class ConntectionError(Exception):
+    pass
