@@ -7,8 +7,8 @@ from itertools import count
 
 def test_bt_client():
     c = BTClient("94f39d29-7d6d-437d-973b-fba39e49d4ee", "69:5D:D9:F8:52:E9")
-    send_q = Queue[str]
-    recv_q = Queue[str]
+    send_q = Queue(20)
+    recv_q = Queue(20)
 
     send_t = Thread(target=c.send_thread, args=(send_q,), daemon=True)
     recv_t = Thread(target=c.recv_thread, args=(recv_q,), daemon=True)
@@ -37,8 +37,8 @@ def test_bt_client():
 
 def test_bt_server():
     c = BTServer("94f39d29-7d6d-437d-973b-fba39e49d4ee")
-    send_q = Queue()
-    recv_q = Queue()
+    send_q = Queue(20)
+    recv_q = Queue(20)
 
     send_t = Thread(target=c.send_thread, args=(send_q,), daemon=True)
     recv_t = Thread(target=c.recv_thread, args=(recv_q,), daemon=True)
