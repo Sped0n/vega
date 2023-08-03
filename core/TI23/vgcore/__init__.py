@@ -8,12 +8,13 @@ from .modules import Scheduler
 
 from objprint import op
 
-from core.utils import DroneInfo, flush_queue, set_cmd, pusher
+from core.utils import DroneInfo, pusher
 from ctyper import PackCorruptedError
 from sensia.utils import PoseData
 from pin.utils import create_uart_buf, depack_recv_list_to_z
 from pin import SerDevice
 from cfg import is_darwin, is_linux, is_arm, SER
+from bt import BTClient
 
 
 class proc:
@@ -35,10 +36,13 @@ class proc:
         self.status_queue: Queue[DroneInfo] = Queue(3)
         self.target_queue: Queue[DroneInfo] = Queue(3)
         self.z_queue: Queue[int] = Queue(3)
+        self.bt_rx_queue: Queue[str] = Queue(3)  # queue for take off message
+        self.to_base_queue: Queue[str] = Queue(3)  # queue for sending coord to bt_tx
 
         # start flag
         self.start = Event()
         self.start.clear()
+        self.bt = BTClient("875c95f9-e17d-4877-b96a-f559e5bff58c", "EC:2E:98:45:0C:4C")
 
         # serial device
         if is_darwin and SER is True:
@@ -88,14 +92,16 @@ class proc:
             # get data from queue
             pose: PoseData = self.pose_queue.get()
 
-            if self.tx_queue.full() is True:
-                flush_queue(self.tx_queue)
-            self.tx_queue.put(pose)
+            # send pose to stm32
+            pusher(self.tx_queue, pose)
 
-            # status
-            if self.status_queue.full() is True:
-                flush_queue(self.status_queue)
-            self.status_queue.put(DroneInfo(pose.x, pose.y, pose.z, pose.yaw))
+            # status queue for is_around detect
+            pusher(self.status_queue, DroneInfo(pose.x, pose.y, pose.z, pose.yaw))
+
+            tmp: str = "x: " + str(pose.x) + " y: " + str(pose.y) + " z: " + str(pose.z)
+
+            # status queue for sending coord to base
+            pusher(self.to_base_queue, tmp)
 
     def missionary(self):
         Scheduler(
@@ -115,15 +121,25 @@ class proc:
 
         tx_thread = Thread(target=self.tx, daemon=True)
         rx_thread = Thread(target=self.rx, daemon=True)
+        bt_send_thread = Thread(
+            target=self.bt.send_thread, args=(self.to_base_queue,), daemon=True
+        )
+        bt_recv_thread = Thread(
+            target=self.bt.recv_thread, args=(self.bt_rx_queue,), daemon=True
+        )
         pose_thread = Thread(target=self.pose_handler, daemon=True)
         mission_thread = Thread(target=self.missionary, daemon=True)
 
         tx_thread.start()
         rx_thread.start()
+        bt_send_thread.start()
+        bt_recv_thread.start()
         pose_thread.start()
         mission_thread.start()
 
         tx_thread.join()
         rx_thread.join()
+        bt_send_thread.join()
+        bt_recv_thread.join()
         pose_thread.join()
         mission_thread.join()
