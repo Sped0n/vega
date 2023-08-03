@@ -276,7 +276,7 @@ def test_ncnn_fov():
     if VDBG is False:
         return None  # skip
     isize = InputSize(416, 416)
-    model = Model(TEST_DATA_DIR + "ti2022", isize, "ncnn")
+    model = Model(TEST_DATA_DIR + "ti2023", isize, "ncnn")
 
     cap = cv2.VideoCapture(0)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
