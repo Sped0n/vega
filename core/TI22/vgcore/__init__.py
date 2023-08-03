@@ -55,7 +55,7 @@ class proc:
         while True:
             curr_pos = self.tx_queue.get()
             # refresh target if not empty
-            if self.target_queue.empty is False:
+            if self.target_queue.empty() is False:
                 curr_target = self.target_queue.get()
             if SER is True:
                 # create uart buf
