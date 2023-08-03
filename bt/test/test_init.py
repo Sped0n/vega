@@ -2,6 +2,7 @@ from bt import BTServer, BTClient
 from threading import Thread
 from queue import Queue
 import time
+from itertools import count
 
 
 def test_bt_client():
@@ -14,9 +15,10 @@ def test_bt_client():
 
     def io(send_q, recv_q):
         start = time.time()
+        c = count()
         while True:
             if time.time() - start > 1:
-                tmp = "client send"
+                tmp = "client send" + str(next(c))
                 send_q.put(tmp)
                 start = time.time()
             if recv_q.empty() is False:
@@ -43,9 +45,10 @@ def test_bt_server():
 
     def io(send_q, recv_q):
         start = time.time()
+        c = count()
         while True:
             if time.time() - start > 1:
-                tmp = "client send"
+                tmp = "server send" + str(next(c))
                 send_q.put(tmp)
                 start = time.time()
             if recv_q.empty() is False:
