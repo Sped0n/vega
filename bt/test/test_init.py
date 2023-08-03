@@ -9,8 +9,8 @@ def test_bt_client():
     send_q = Queue[str]
     recv_q = Queue[str]
 
-    send_t = Thread(target=c.send_thread, args=(send_q,))
-    recv_t = Thread(target=c.recv_thread, args=(recv_q,))
+    send_t = Thread(target=c.send_thread, args=(send_q,), daemon=True)
+    recv_t = Thread(target=c.recv_thread, args=(recv_q,), daemon=True)
 
     def io(send_q, recv_q):
         start = time.time()
@@ -22,7 +22,7 @@ def test_bt_client():
             if recv_q.empty() is False:
                 print(recv_q.get())
 
-    io_t = Thread(target=io, args=(send_q, recv_q))
+    io_t = Thread(target=io, args=(send_q, recv_q), daemon=True)
 
     io_t.start()
     send_t.start()
@@ -35,11 +35,11 @@ def test_bt_client():
 
 def test_bt_server():
     c = BTServer("94f39d29-7d6d-437d-973b-fba39e49d4ee")
-    send_q = Queue[str]
-    recv_q = Queue[str]
+    send_q = Queue()
+    recv_q = Queue()
 
-    send_t = Thread(target=c.send_thread, args=(send_q,))
-    recv_t = Thread(target=c.recv_thread, args=(recv_q,))
+    send_t = Thread(target=c.send_thread, args=(send_q,), daemon=True)
+    recv_t = Thread(target=c.recv_thread, args=(recv_q,), daemon=True)
 
     def io(send_q, recv_q):
         start = time.time()
@@ -51,7 +51,7 @@ def test_bt_server():
             if recv_q.empty() is False:
                 print(recv_q.get())
 
-    io_t = Thread(target=io, args=(send_q, recv_q))
+    io_t = Thread(target=io, args=(send_q, recv_q), daemon=True)
 
     io_t.start()
     send_t.start()
