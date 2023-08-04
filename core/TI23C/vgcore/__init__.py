@@ -10,6 +10,8 @@ from objprint import op
 from bt import BTServer
 from core.utils import pusher
 
+from .modules import bt_rx, bt_tx
+
 
 class proc:
     def __init__(
@@ -67,10 +69,20 @@ class proc:
         tx_thread = Thread(target=self.tx, daemon=True)
         rx_thread = Thread(target=self.rx, daemon=True)
         bt_send_thread = Thread(
-            target=self.bt.send_thread, args=(self.bt_tx_queue,), daemon=True
+            target=bt_tx,
+            args=(
+                self.bt,
+                self.bt_tx_queue,
+            ),
+            daemon=True,
         )
         bt_recv_thread = Thread(
-            target=self.bt.recv_thread, args=(self.to_base_queue,), daemon=True
+            target=bt_rx,
+            args=(
+                self.bt,
+                self.to_base_queue,
+            ),
+            daemon=True,
         )
         pos_thread = Thread(target=self.pos_handler, daemon=True)
         mission_thread = Thread(target=self.missionary, daemon=True)

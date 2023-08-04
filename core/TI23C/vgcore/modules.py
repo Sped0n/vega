@@ -1,11 +1,30 @@
 from __future__ import annotations
-from multiprocessing import Queue as mQueue
-from queue import Queue, Empty
-from time import sleep, time
-from threading import Event
 
-from core.utils import DroneInfo, pusher
+from multiprocessing import Queue as mQueue
+from queue import Empty, Queue
+from threading import Event
+from time import sleep, time
+
+from bt import BTServer
 from compass import is_around
+from core.utils import DroneInfo, pusher
+from ctyper import ConntectionError
+
+
+def bt_tx(client: BTServer, send_queue: Queue[str]) -> None:
+    while True:
+        try:
+            client.send(send_queue.get())
+        except ConntectionError:
+            client.error_handle()
+
+
+def bt_rx(client: BTServer, recv_queue: Queue[str]) -> None:
+    while True:
+        try:
+            pusher(recv_queue, client.recieve)
+        except ConntectionError:
+            client.error_handle()
 
 
 class Scheduler:
