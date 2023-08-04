@@ -17,8 +17,8 @@ def test_ti23_mapper():
     device.capabilities(width=128, height=64, rotate=0, mode="1")
     start = time()
     t = trailer()
-    o_trail = Offsetter((28, 2), 1)
-    a, b = corrd2block(500, -500)
+    o_trail = Offsetter((28, -2), 1)
+    a, b = corrd2block(1000, -500)
     t.add_dot(o_trail.calc(a, b))
     while True:
         with canvas(device) as draw:
