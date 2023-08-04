@@ -6,7 +6,7 @@ from ctyper import Number
 class MatrixKeyBoard:
     def __init__(self, c1_pin: int, c2_pin: int, r1_pin: int, r2_pin: int) -> None:
         GPIO.setmode(GPIO.BOARD)
-        GPIO.setwarings(False)
+        GPIO.setwarnings(False)
         self.c1 = c1_pin
         self.c2 = c2_pin
         self.r1 = r1_pin
@@ -14,7 +14,7 @@ class MatrixKeyBoard:
 
     def __column_set_in(self) -> None:
         GPIO.setup(self.c1, GPIO.IN)
-        GPIO.setup(self.c2, GPIO.INPUT)
+        GPIO.setup(self.c2, GPIO.IN)
 
     def __column_get_in(self, match: int) -> int:
         if GPIO.input(self.c1) == match:
