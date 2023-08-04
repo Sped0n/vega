@@ -5,9 +5,10 @@ from pathlib import Path
 from queue import Empty
 from threading import Event, Thread
 from time import sleep
+from vision.TI23 import filter_box
 
 from core.utils import get_cmd, pusher
-from ctyper import Command, Image, InputSize
+from ctyper import Command, Image, InputSize, ObjDetected, Array
 from ml import Model
 
 DATA_DIR = str(Path(__file__).resolve().parent / "data") + "/"
@@ -35,7 +36,7 @@ class proc:
 
         self.run()
 
-    def ti2022(self):
+    def ti2023(self):
         while True:
             self.ti_enable.wait()
 
@@ -46,7 +47,9 @@ class proc:
                 continue
 
             # data process
-            results = self.ti.infer(frame)
+            raw_results = self.ti.infer(frame)
+            results: list[ObjDetected] = filter_box(raw_results, frame)
+
             pusher(self.ml2vega_queue, {"ti": results})
 
     def manager(self):
@@ -60,7 +63,7 @@ class proc:
         sleep(1)
 
         manager_thread = Thread(target=self.manager, daemon=True)
-        ti2022_thread = Thread(target=self.ti2022, daemon=True)
+        ti2022_thread = Thread(target=self.ti2023, daemon=True)
 
         manager_thread.start()
         ti2022_thread.start()

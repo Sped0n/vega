@@ -13,7 +13,9 @@ import platform
 import random
 from warnings import warn
 
-from ctyper import Color
+import numpy as np
+
+from ctyper import Color, Array
 
 is_x86: bool = platform.machine() in ("i386", "AMD64", "x86_64")
 is_arm: bool = platform.machine() in ("arm64", "aarch64")
@@ -43,3 +45,9 @@ try:
     multiprocessing.set_start_method("spawn")
 except RuntimeError:
     pass
+
+lower_red1: Array = np.array([0, 50, 50])
+upper_red1: Array = np.array([10, 255, 255])
+
+lower_red2: Array = np.array([170, 50, 50])
+upper_red2: Array = np.array([180, 255, 255])
