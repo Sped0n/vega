@@ -1,7 +1,9 @@
-import pytest
 from itertools import count
 
-MatrixKeyBoard = pytest.importorskip("pin").matrix.MatrixKeyBoard
+import pytest
+
+pin = pytest.importorskip("pin")
+from pin.matrix import MatrixKeyBoard  # noqa: E402
 
 
 def test_matrix():
