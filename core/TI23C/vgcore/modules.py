@@ -11,6 +11,22 @@ from core.utils import DroneInfo, pusher
 from ctyper import ConntectionError
 
 
+class Transmit:
+    def __init__(
+        self,
+        x,
+        y,
+        fire_x: int | None = None,
+        fire_y: int | None = None,
+        stage: int | None = None,
+    ) -> None:
+        self.x = x
+        self.y = y
+        self.fire_x = fire_x
+        self.fire_y = fire_y
+        self.stage = stage
+
+
 def bt_tx(client: BTServer, send_queue: Queue[str]) -> None:
     while True:
         try:
