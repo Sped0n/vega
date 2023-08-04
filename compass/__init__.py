@@ -49,6 +49,6 @@ def is_around(
 
 
 def corrd2block(x, y):
-    x_tmp = round(x / 100 / 48 * 72)
-    y_tmp = 60 + round(y / 100 / 40 * 60)
+    y_tmp = 60 - round(x / 100 / 40 * 60)
+    x_tmp = -round(y / 100 / 48 * 72)
     return x_tmp, y_tmp
