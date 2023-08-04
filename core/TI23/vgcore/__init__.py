@@ -98,7 +98,7 @@ class proc:
             # status queue for is_around detect
             pusher(self.status_queue, DroneInfo(pose.x, pose.y, pose.z, pose.yaw))
 
-            tmp: str = "x: " + str(pose.x) + " y: " + str(pose.y) + " z: " + str(pose.z)
+            tmp: str = str(pose.x) + "," + str(pose.y) + "," + str(pose.z)
 
             # status queue for sending coord to base
             pusher(self.to_base_queue, tmp)
