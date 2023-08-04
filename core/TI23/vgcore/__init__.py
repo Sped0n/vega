@@ -89,6 +89,7 @@ class proc:
             pusher(self.z_queue, z)
 
     def pose_handler(self):
+        start = time()
         while True:
             # get data from queue
             pose: PoseData = self.pose_queue.get()
@@ -99,10 +100,11 @@ class proc:
             # status queue for is_around detect
             pusher(self.status_queue, DroneInfo(pose.x, pose.y, pose.z, pose.yaw))
 
-            tmp: str = str(pose.x) + "," + str(pose.y) + "," + str(pose.z)
-
             # status queue for sending coord to base
-            pusher(self.to_base_queue, tmp)
+            if time() - start > 0.5:
+                tmp: str = str(pose.x) + "," + str(pose.y) + ",N/A,N/A,N/A"
+                pusher(self.to_base_queue, tmp)
+                start = time()
 
     def missionary(self):
         Scheduler(
