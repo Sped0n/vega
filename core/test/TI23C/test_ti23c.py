@@ -8,7 +8,7 @@ from core.TI23C.vgcore import proc as vgproc
 from core.TI23C.mlcore import proc as mlproc
 
 
-def test_ti23c():
+def test_car_ti23():
     cam_q = mQueue(3)
     vega2media_q = mQueue(5)
     vega2ml_q = mQueue(5)

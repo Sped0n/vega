@@ -8,7 +8,7 @@ from core.TI23.vgcore import proc as vgproc
 from core.TI23.mlcore import proc as mlproc
 
 
-def test_ti23():
+def test_drone_ti23():
     if NORS is True:
         return None
     pose_q = mQueue(5)
