@@ -10,6 +10,6 @@ def test_matrix():
     attempts = count()
     m = MatrixKeyBoard(22, 24, 38, 40)
     while next(attempts) < 150:
-        key = m.get_key()
+        key = m.read()
         if key != -1:
             print(key)
