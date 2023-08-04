@@ -1,8 +1,5 @@
 from itertools import count
 
-import pytest
-
-pin = pytest.importorskip("pin")
 from pin.matrix import MatrixKeyBoard  # noqa: E402
 
 
