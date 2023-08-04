@@ -12,7 +12,7 @@ from lumanos.TI23 import (
     basic_confirm,
     advanced_confirm,
     basic_layout,
-    adcanced_layout,
+    advanced_layout,
 )
 from luma.core.render import canvas
 from compass import corrd2block
@@ -137,7 +137,7 @@ def test_ti23_adv_layout():
     start = time()
     while True:
         with canvas(device) as draw:
-            adcanced_layout(draw, (1000, -500), 2000)
+            advanced_layout(draw, 2000, (1000, -500))
         sleep(0.02)
         if time() - start > 3:
             break

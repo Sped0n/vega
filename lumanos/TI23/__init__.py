@@ -99,8 +99,11 @@ def basic_layout(
         )
 
 
-def adcanced_layout(
-    draw, fire: tuple[int, int], mileage_in_cm: int, stage: int | None = None
+def advanced_layout(
+    draw,
+    mileage_in_cm: int,
+    fire: tuple[int, int] | None = None,
+    stage: int | None = None,
 ):
     draw.rectangle((0, 0, 127, 63), outline="white", fill="black")
     # heading
@@ -108,12 +111,16 @@ def adcanced_layout(
     # line 1: fire
     draw.line((1, 17, 128, 17), fill="white")
     draw.text((1, 17), "fire -> ", fill="white")
-    draw.text(
-        (1, 27),
-        f"x:{(fire[0]/ 1000):.2f}m y:{(fire[1]/ 1000):.2f}m",  # noqa: E501
-        fill="white",
-        spacing=2,
-    )
+    if fire is None:
+        assert fire is not None
+        draw.text(
+            (1, 27),
+            f"x:{(fire[0]/ 1000):.2f}m y:{(fire[1]/ 1000):.2f}m",  # noqa: E501
+            fill="white",
+            spacing=2,
+        )
+    else:
+        draw.text((1, 27), "N/A", fill="white")
     draw.line((1, 37, 128, 37), fill="white")
     # line2: mileage
     draw.text((1, 38), "mileage -> ", fill="white")
