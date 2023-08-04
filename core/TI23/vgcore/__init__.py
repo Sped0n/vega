@@ -4,7 +4,8 @@ from multiprocessing import Queue as mQueue
 from queue import Queue
 from threading import Thread, Event
 from time import sleep, time
-from .modules import Scheduler
+from .modules import Scheduler, bt_rx, bt_tx
+
 
 from objprint import op
 
@@ -122,10 +123,20 @@ class proc:
         tx_thread = Thread(target=self.tx, daemon=True)
         rx_thread = Thread(target=self.rx, daemon=True)
         bt_send_thread = Thread(
-            target=self.bt.send_thread, args=(self.to_base_queue,), daemon=True
+            target=bt_tx,
+            args=(
+                self.bt,
+                self.to_base_queue,
+            ),
+            daemon=True,
         )
         bt_recv_thread = Thread(
-            target=self.bt.recv_thread, args=(self.bt_rx_queue,), daemon=True
+            target=bt_rx,
+            args=(
+                self.bt,
+                self.bt_rx_queue,
+            ),
+            daemon=True,
         )
         pose_thread = Thread(target=self.pose_handler, daemon=True)
         mission_thread = Thread(target=self.missionary, daemon=True)

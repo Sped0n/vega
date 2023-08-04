@@ -6,6 +6,24 @@ from threading import Event
 
 from core.utils import DroneInfo, pusher
 from compass import is_around
+from bt import BTClient
+from ctyper import ConntectionError
+
+
+def bt_tx(client: BTClient, send_queue: Queue[str]) -> None:
+    while True:
+        try:
+            client.send(send_queue.get())
+        except ConntectionError:
+            client.error_handle()
+
+
+def bt_rx(client: BTClient, recv_queue: Queue[str]) -> None:
+    while True:
+        try:
+            pusher(recv_queue, client.recieve)
+        except ConntectionError:
+            client.error_handle()
 
 
 class Scheduler:
