@@ -23,7 +23,7 @@ def bt_rx(client: BTClient, bt_start_event: Event) -> None:
     while True:
         try:
             tmp = client.recieve()
-            if tmp == "RTTO":
+            if tmp == "PTTO":
                 set_thread_event(bt_start_event, True)
         except ConntectionError:
             client.error_handle()
