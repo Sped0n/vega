@@ -39,6 +39,7 @@ class proc:
         self.z_queue: Queue[int] = Queue(3)
         self.bt_rx_queue: Queue[str] = Queue(3)  # queue for take off message
         self.to_base_queue: Queue[str] = Queue(3)  # queue for sending coord to bt_tx
+        self.stage_queue: Queue[int] = Queue(3)  # queue for sending stage to bt_tx
 
         # start flag
         self.rx_start = Event()  # receive z from stm32
@@ -92,6 +93,7 @@ class proc:
 
     def pose_handler(self):
         start = time()
+        last_stage = 0
         while True:
             # get data from queue
             pose: PoseData = self.pose_queue.get()
@@ -104,7 +106,13 @@ class proc:
 
             # status queue for sending coord to base
             if time() - start > 0.5:
-                tmp: str = str(pose.x) + "," + str(pose.y) + ",N/A,N/A,N/A"
+                if self.stage_queue.empty() is False:
+                    tmp_stage = self.stage_queue.get()
+                    if tmp_stage != last_stage:
+                        last_stage = tmp_stage
+                tmp: str = (
+                    str(pose.x) + "," + str(pose.y) + ",N/A,N/A" + "," + str(last_stage)
+                )
                 pusher(self.to_base_queue, tmp)
                 start = time()
 
@@ -119,6 +127,7 @@ class proc:
             self.vega2ml_queue,
             self.ml2vega_queue,
             self.target_queue,
+            self.stage_queue,
         ).run()
 
     def run(self):
