@@ -112,7 +112,7 @@ class Scheduler:
                         # if we are around the target for 5 times in a row,
                         # we are good to go
                         if self.around_count >= 3:
-                            self.__stage_jump()
+                            self.__stage_jump(2)
                 case 2:
                     if self.roaming is False:
                         tmp_target = DroneInfo(850, -50, 1600, 0)
@@ -126,7 +126,7 @@ class Scheduler:
                         # if we are around the target for 5 times in a row,
                         # we are good to go
                         if self.around_count >= 3:
-                            self.__stage_jump()
+                            self.__stage_jump(3)
                 case 3:
                     if self.roaming is False:
                         tmp_target = DroneInfo(1650, -50, 1600, 0)
@@ -140,7 +140,7 @@ class Scheduler:
                         # if we are around the target for 5 times in a row,
                         # we are good to go
                         if self.around_count >= 3:
-                            self.__stage_jump()
+                            self.__stage_jump(4)
                 case 4:
                     if self.roaming is False:
                         tmp_target = DroneInfo(2450, -50, 1600, 0)
@@ -154,7 +154,7 @@ class Scheduler:
                         # if we are around the target for 5 times in a row,
                         # we are good to go
                         if self.around_count >= 3:
-                            self.__stage_jump()
+                            self.__stage_jump(5)
                 case 5:
                     if self.roaming is False:
                         tmp_target = DroneInfo(3250, -50, 1600, 0)
@@ -168,7 +168,7 @@ class Scheduler:
                         # if we are around the target for 5 times in a row,
                         # we are good to go
                         if self.around_count >= 3:
-                            self.__stage_jump()
+                            self.__stage_jump(6)
                 case 6:
                     if self.roaming is False:
                         tmp_target = DroneInfo(3250, -850, 1600, 0)
@@ -182,7 +182,7 @@ class Scheduler:
                         # if we are around the target for 5 times in a row,
                         # we are good to go
                         if self.around_count >= 3:
-                            self.__stage_jump()
+                            self.__stage_jump(7)
                 case 7:
                     if self.roaming is False:
                         tmp_target = DroneInfo(2450, -850, 1600, 0)
@@ -196,7 +196,7 @@ class Scheduler:
                         # if we are around the target for 5 times in a row,
                         # we are good to go
                         if self.around_count >= 3:
-                            self.__stage_jump()
+                            self.__stage_jump(8)
                 case 8:
                     if self.roaming is False:
                         tmp_target = DroneInfo(1650, -850, 1600, 0)
@@ -210,7 +210,7 @@ class Scheduler:
                         # if we are around the target for 5 times in a row,
                         # we are good to go
                         if self.around_count >= 3:
-                            self.__stage_jump()
+                            self.__stage_jump(9)
                 case 9:
                     if self.roaming is False:
                         tmp_target = DroneInfo(850, -850, 1600, 0)
@@ -224,7 +224,7 @@ class Scheduler:
                         # if we are around the target for 5 times in a row,
                         # we are good to go
                         if self.around_count >= 3:
-                            self.__stage_jump()
+                            self.__stage_jump(10)
                 case 10:
                     if self.roaming is False:
                         tmp_target = DroneInfo(850, -1650, 1600, 0)
@@ -238,7 +238,7 @@ class Scheduler:
                         # if we are around the target for 5 times in a row,
                         # we are good to go
                         if self.around_count >= 3:
-                            self.__stage_jump()
+                            self.__stage_jump(11)
                 case 11:
                     if self.roaming is False:
                         tmp_target = DroneInfo(1650, -1650, 1600, 0)
@@ -252,7 +252,7 @@ class Scheduler:
                         # if we are around the target for 5 times in a row,
                         # we are good to go
                         if self.around_count >= 3:
-                            self.__stage_jump()
+                            self.__stage_jump(12)
                 case 12:
                     if self.roaming is False:
                         tmp_target = DroneInfo(2450, -1650, 1600, 0)
@@ -266,7 +266,7 @@ class Scheduler:
                         # if we are around the target for 5 times in a row,
                         # we are good to go
                         if self.around_count >= 3:
-                            self.__stage_jump()
+                            self.__stage_jump(13)
                 case 13:
                     if self.roaming is False:
                         tmp_target = DroneInfo(3250, -1650, 1600, 0)
@@ -280,7 +280,7 @@ class Scheduler:
                         # if we are around the target for 5 times in a row,
                         # we are good to go
                         if self.around_count >= 3:
-                            self.__stage_jump()
+                            self.__stage_jump(14)
                 case 14:
                     if self.roaming is False:
                         tmp_target = DroneInfo(3250, -2450, 1600, 0)
@@ -294,7 +294,7 @@ class Scheduler:
                         # if we are around the target for 5 times in a row,
                         # we are good to go
                         if self.around_count >= 3:
-                            self.__stage_jump()
+                            self.__stage_jump(15)
                 case 15:
                     if self.roaming is False:
                         tmp_target = DroneInfo(2450, -2450, 1600, 0)
@@ -308,7 +308,7 @@ class Scheduler:
                         # if we are around the target for 5 times in a row,
                         # we are good to go
                         if self.around_count >= 3:
-                            self.__stage_jump()
+                            self.__stage_jump(16)
                 case 16:
                     if self.roaming is False:
                         tmp_target = DroneInfo(1650, -2450, 1600, 0)
@@ -322,7 +322,7 @@ class Scheduler:
                         # if we are around the target for 5 times in a row,
                         # we are good to go
                         if self.around_count >= 3:
-                            self.__stage_jump()
+                            self.__stage_jump(17)
                 case 17:
                     if self.roaming is False:
                         tmp_target = DroneInfo(850, -2450, 1600, 0)
@@ -336,7 +336,7 @@ class Scheduler:
                         # if we are around the target for 5 times in a row,
                         # we are good to go
                         if self.around_count >= 3:
-                            self.__stage_jump()
+                            self.__stage_jump(18)
                 case 18:
                     if self.roaming is False:
                         tmp_target = DroneInfo(850, -3250, 1600, 0)
@@ -350,7 +350,7 @@ class Scheduler:
                         # if we are around the target for 5 times in a row,
                         # we are good to go
                         if self.around_count >= 3:
-                            self.__stage_jump()
+                            self.__stage_jump(19)
                 case 19:
                     if self.roaming is False:
                         tmp_target = DroneInfo(1650, -3250, 1600, 0)
@@ -364,7 +364,7 @@ class Scheduler:
                         # if we are around the target for 5 times in a row,
                         # we are good to go
                         if self.around_count >= 3:
-                            self.__stage_jump()
+                            self.__stage_jump(20)
                 case 20:
                     if self.roaming is False:
                         tmp_target = DroneInfo(3250, -3250, 1600, 0)
@@ -378,7 +378,7 @@ class Scheduler:
                         # if we are around the target for 5 times in a row,
                         # we are good to go
                         if self.around_count >= 3:
-                            self.__stage_jump()
+                            self.__stage_jump(21)
                 case 21:
                     if self.roaming is False:
                         tmp_target = DroneInfo(3250, -4050, 1600, 0)
@@ -392,7 +392,7 @@ class Scheduler:
                         # if we are around the target for 5 times in a row,
                         # we are good to go
                         if self.around_count >= 3:
-                            self.__stage_jump()
+                            self.__stage_jump(22)
                 case 22:
                     if self.roaming is False:
                         tmp_target = DroneInfo(2450, -4050, 1600, 0)
@@ -406,7 +406,7 @@ class Scheduler:
                         # if we are around the target for 5 times in a row,
                         # we are good to go
                         if self.around_count >= 3:
-                            self.__stage_jump()
+                            self.__stage_jump(23)
                 case 23:
                     if self.roaming is False:
                         tmp_target = DroneInfo(1650, -4050, 1600, 0)
@@ -420,7 +420,7 @@ class Scheduler:
                         # if we are around the target for 5 times in a row,
                         # we are good to go
                         if self.around_count >= 3:
-                            self.__stage_jump()
+                            self.__stage_jump(24)
                 case 24:
                     if self.roaming is False:
                         tmp_target = DroneInfo(850, -4050, 1600, 0)
@@ -434,7 +434,7 @@ class Scheduler:
                         # if we are around the target for 5 times in a row,
                         # we are good to go
                         if self.around_count >= 3:
-                            self.__stage_jump()
+                            self.__stage_jump(25)
                 case 25:
                     if self.roaming is False:
                         tmp_target = DroneInfo(850, -4050, 1600, 0)
@@ -448,7 +448,7 @@ class Scheduler:
                         # if we are around the target for 5 times in a row,
                         # we are good to go
                         if self.around_count >= 3:
-                            self.__stage_jump()
+                            self.__stage_jump(26)
                 case 26:
                     if self.roaming is False:
                         tmp_target = DroneInfo(50, -4050, 1600, 0)
@@ -462,7 +462,7 @@ class Scheduler:
                         # if we are around the target for 5 times in a row,
                         # we are good to go
                         if self.around_count >= 3:
-                            self.__stage_jump()
+                            self.__stage_jump(27)
                 case 27:
                     if self.roaming is False:
                         tmp_target = DroneInfo(50, -3250, 1600, 0)
@@ -476,7 +476,7 @@ class Scheduler:
                         # if we are around the target for 5 times in a row,
                         # we are good to go
                         if self.around_count >= 3:
-                            self.__stage_jump()
+                            self.__stage_jump(28)
                 case 28:
                     if self.roaming is False:
                         tmp_target = DroneInfo(50, -2450, 1600, 0)
@@ -490,7 +490,7 @@ class Scheduler:
                         # if we are around the target for 5 times in a row,
                         # we are good to go
                         if self.around_count >= 3:
-                            self.__stage_jump()
+                            self.__stage_jump(29)
                 case 29:
                     if self.roaming is False:
                         tmp_target = DroneInfo(50, -1650, 1600, 0)
@@ -504,7 +504,7 @@ class Scheduler:
                         # if we are around the target for 5 times in a row,
                         # we are good to go
                         if self.around_count >= 3:
-                            self.__stage_jump()
+                            self.__stage_jump(30)
                 case 30:
                     if self.roaming is False:
                         tmp_target = DroneInfo(50, -850, 1600, 0)
@@ -518,8 +518,8 @@ class Scheduler:
                         # if we are around the target for 5 times in a row,
                         # we are good to go
                         if self.around_count >= 3:
-                            self.__stage_jump()
-                case 27:
+                            self.__stage_jump(31)
+                case 31:
                     if self.roaming is False:
                         tmp_target = DroneInfo(0, 0, 1600, 0)
                     else:
@@ -532,13 +532,12 @@ class Scheduler:
                         # if we are around the target for 5 times in a row,
                         # we are good to go
                         if self.around_count >= 3:
-                            self.__stage_jump()
-                case 28:
+                            self.__stage_jump(32)
+                case 32:
                     if self.roaming is False:
                         tmp_target = DroneInfo(0, 0, 0, 0, True)
                     else:
                         sleep(5)
-                        self.__stage_jump()
 
             # if we have a new target, push it to the target array
             if tmp_target != self.curr_target and tmp_target != DroneInfo(
