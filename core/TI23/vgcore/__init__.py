@@ -88,7 +88,6 @@ class proc:
                 continue
             # push to queue
             self.rx_start.set()
-            print(z)
             pusher(self.z_queue, z)
 
     def pose_handler(self):
