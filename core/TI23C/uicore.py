@@ -79,12 +79,14 @@ class proc:
                         basic_confirm(draw_info)
                         if keypress == 1:
                             self.ui_stage = 3  # confirm
+                            set_thread_event(self.mapper_enable, True)
                         elif keypress == 2:
                             self.ui_stage = 0  # cancel, back to welcome screen
                     case 2:
                         advanced_confirm(draw_info)
                         if keypress == 1:
                             self.ui_stage = 4  # confirm
+                            set_thread_event(self.mapper_enable, True)
                         elif keypress == 2:
                             self.ui_stage = 0  # cancel, back to welcome screen
                     case 3:
@@ -130,8 +132,14 @@ class proc:
                 t.darw(draw_map)
 
     def keyboard(self):
+        last_key = -1
         while True:
-            pusher(self.key_queue, self.k.read())
+            key = self.k.read()
+            if key == last_key:
+                pusher(self.key_queue, -1)
+            else:
+                pusher(self.key_queue, key)
+            last_key = key
 
     def run(self):
         # warm up
