@@ -1,12 +1,13 @@
 from __future__ import annotations
-from multiprocessing import Queue as mQueue
-from queue import Queue, Empty
-from time import sleep, time
-from threading import Event
 
-from core.utils import DroneInfo, pusher
-from compass import is_around
+from multiprocessing import Queue as mQueue
+from queue import Queue
+from threading import Event
+from time import sleep, time
+
 from bt import BTClient
+from compass import is_around
+from core.utils import DroneInfo, pusher, set_thread_event
 from ctyper import ConntectionError
 
 
@@ -18,10 +19,12 @@ def bt_tx(client: BTClient, send_queue: Queue[str]) -> None:
             client.error_handle()
 
 
-def bt_rx(client: BTClient, recv_queue: Queue[str]) -> None:
+def bt_rx(client: BTClient, bt_start_event: Event) -> None:
     while True:
         try:
-            pusher(recv_queue, client.recieve())
+            tmp = client.recieve()
+            if tmp == "RTTO":
+                set_thread_event(bt_start_event, True)
         except ConntectionError:
             client.error_handle()
 
@@ -30,7 +33,8 @@ class Scheduler:
     def __init__(
         self,
         task_id: int,
-        start: Event,
+        rx_start: Event,
+        bt_start: Event,
         status_queue: Queue[DroneInfo],
         z_queue: Queue[int],
         vega2sensia_queue: mQueue,  # cmd
@@ -57,7 +61,8 @@ class Scheduler:
         self.roaming: bool = True
 
         # start
-        self.start = start
+        self.rx_start = rx_start
+        self.bt_start = bt_start
 
         # current target for comparsion
         self.curr_target: DroneInfo = DroneInfo(0, 0, 0, 0)
@@ -82,7 +87,10 @@ class Scheduler:
                 start = time()
             match self.stage:
                 case 0:
-                    self.start.wait()
+                    self.bt_start.wait()
+                    print("bt start")
+                    self.rx_start.wait()
+                    print("rx start")
                     self.__stage_jump(1)
                 case 1:
                     # Drone takes off and hovers at the starting point

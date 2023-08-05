@@ -2,20 +2,20 @@ from __future__ import annotations
 
 from multiprocessing import Queue as mQueue
 from queue import Queue
-from threading import Thread, Event
+from threading import Event, Thread
 from time import sleep, time
-from .modules import Scheduler, bt_rx, bt_tx
-
 
 from objprint import op
 
+from bt import BTClient
+from cfg import SER, is_arm, is_darwin, is_linux
 from core.utils import DroneInfo, pusher
 from ctyper import PackCorruptedError
-from sensia.utils import PoseData
-from pin.utils import create_uart_buf, depack_recv_list_to_z
 from pin import SerDevice
-from cfg import is_darwin, is_linux, is_arm, SER
-from bt import BTClient
+from pin.utils import create_uart_buf, depack_recv_list_to_z
+from sensia.utils import PoseData
+
+from .modules import Scheduler, bt_rx, bt_tx
 
 
 class proc:
@@ -41,8 +41,10 @@ class proc:
         self.to_base_queue: Queue[str] = Queue(3)  # queue for sending coord to bt_tx
 
         # start flag
-        self.start = Event()
-        self.start.clear()
+        self.rx_start = Event()  # receive z from stm32
+        self.rx_start.clear()
+        self.bt_start = Event()  # receive bt message
+        self.bt_start.clear()
         self.bt = BTClient("875c95f9-e17d-4877-b96a-f559e5bff58c", "EC:2E:98:45:0C:4C")
 
         # serial device
@@ -84,7 +86,7 @@ class proc:
             except PackCorruptedError:
                 continue
             # push to queue
-            self.start.set()
+            self.rx_start.set()
             print(z)
             pusher(self.z_queue, z)
 
@@ -109,7 +111,8 @@ class proc:
     def missionary(self):
         Scheduler(
             1,
-            self.start,
+            self.rx_start,
+            self.bt_start,
             self.status_queue,
             self.z_queue,
             self.vega2sensia_queue,
@@ -136,7 +139,7 @@ class proc:
             target=bt_rx,
             args=(
                 self.bt,
-                self.bt_rx_queue,
+                self.bt_start,
             ),
             daemon=True,
         )

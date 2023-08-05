@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from multiprocessing import Queue as mQueue
 from queue import Queue
-from threading import Event, Thread
-from time import sleep, time
+from threading import Thread
+from time import sleep
 
 
 from bt import BTServer
@@ -29,7 +29,7 @@ class proc:
         self.ui2vega_queue = ui2vega_queue
 
         # thread queue init
-        self.bt_tx_queue: Queue[str] = Queue(3)  # queue for take off message
+        self.bt_tx_queue: Queue[str] = Queue(15)  # queue for take off message
         self.bt_rx_queue: Queue[str] = Queue(3)  # queue for sending coord to bt_tx
         self.key1_queue: Queue[int] = Queue(3)  # queue for keyboard stream 1
         self.key2_queue: Queue[int] = Queue(3)  # basically the same as stream 1
@@ -65,6 +65,12 @@ class proc:
                 tmp1.stage = int(_slice[4])
 
             pusher(self.transmit_queue, tmp1)
+
+    def take_off_handler(self):
+        while True:
+            cmd = self.ui2vega_queue.get()
+            for _ in range(10):
+                pusher(self.bt_tx_queue, cmd)
 
     def run(self):
         # warm up

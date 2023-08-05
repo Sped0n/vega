@@ -7,23 +7,22 @@ from time import sleep
 
 from luma.core.render import canvas
 
-from compass import corrd2block
+from compass import Odemeter, corrd2block
 from core.utils import pusher, set_thread_event
-from ctyper import Command, Image
 from lumanos.device import OLED1306
 from lumanos.TI23 import (
+    advanced_confirm,
+    advanced_layout,
+    basic_confirm,
+    basic_layout,
     mapper,
     trailer,
     welcome_screen,
-    basic_confirm,
-    advanced_confirm,
-    basic_layout,
-    advanced_layout,
 )
 from lumanos.utils import Offsetter
 from pin.matrix import MatrixKeyBoard
+
 from .vgcore.modules import Transmit
-from compass import Odemeter
 
 
 class proc:
@@ -92,6 +91,7 @@ class proc:
                     case 3:
                         if accept_key_input:
                             accept_key_input = False  # prevent keypress
+                            pusher(self.ui2vega_queue, "PTTO")  # permission to take off
                         t_pack = self.transmit_queue.get()
                         # send x and y to mapper
                         pusher(self.to_mapper_queue, (t_pack.x, t_pack.y))
@@ -101,6 +101,7 @@ class proc:
                     case 4:
                         if accept_key_input:
                             accept_key_input = False  # prevent keypress
+                            pusher(self.ui2vega_queue, "PTTO")  # permision to take off
                         t_pack = self.transmit_queue.get()
                         # send x and y to mapper
                         pusher(self.to_mapper_queue, (t_pack.x, t_pack.y))
