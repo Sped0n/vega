@@ -32,7 +32,7 @@ def bt_tx(client: BTServer, send_queue: Queue[str]) -> None:
         try:
             tmp = send_queue.get()
             client.send(tmp)
-            print("=> bt sent: ", tmp)
+            print("==> bt sent: ", tmp)
         except ConntectionError:
             client.error_handle()
 
@@ -40,7 +40,9 @@ def bt_tx(client: BTServer, send_queue: Queue[str]) -> None:
 def bt_rx(client: BTServer, recv_queue: Queue[str]) -> None:
     while True:
         try:
-            pusher(recv_queue, client.recieve())
+            tmp = client.recieve()
+            print("==> bt recv: ", tmp)
+            pusher(recv_queue, tmp)
         except ConntectionError:
             client.error_handle()
 
