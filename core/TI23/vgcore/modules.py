@@ -14,7 +14,9 @@ from ctyper import ConntectionError
 def bt_tx(client: BTClient, send_queue: Queue[str]) -> None:
     while True:
         try:
-            client.send(send_queue.get())
+            tmp = send_queue.get()
+            client.send(tmp)
+            print("==> bt sent: ", tmp)
         except ConntectionError:
             client.error_handle()
 
@@ -23,6 +25,7 @@ def bt_rx(client: BTClient, bt_start_event: Event) -> None:
     while True:
         try:
             tmp = client.recieve()
+            print("==> bt recv: ", tmp)
             if tmp == "PTTO":
                 set_thread_event(bt_start_event, True)
         except ConntectionError:

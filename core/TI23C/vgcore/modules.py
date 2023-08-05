@@ -30,7 +30,9 @@ class Transmit:
 def bt_tx(client: BTServer, send_queue: Queue[str]) -> None:
     while True:
         try:
-            client.send(send_queue.get())
+            tmp = send_queue.get()
+            client.send(tmp)
+            print("=> bt sent: ", tmp)
         except ConntectionError:
             client.error_handle()
 
