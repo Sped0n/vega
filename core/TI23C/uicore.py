@@ -97,7 +97,9 @@ class proc:
                         pusher(self.to_mapper_queue, (t_pack.x, t_pack.y))
                         # calculate mileage
                         mileage = o.add((t_pack.x, t_pack.y))
-                        basic_layout(draw_info, (t_pack.x, t_pack.y), mileage)
+                        basic_layout(
+                            draw_info, (t_pack.x, t_pack.y), mileage, t_pack.stage
+                        )
                     case 4:
                         if accept_key_input:
                             accept_key_input = False  # prevent keypress
@@ -112,9 +114,11 @@ class proc:
                                 draw_info,
                                 mileage,
                                 (t_pack.fire_x, t_pack.fire_y),
+                                t_pack.stage,
                             )
                         else:
-                            advanced_layout(draw_info, mileage)
+                            advanced_layout(draw_info, mileage, stage=t_pack.stage)
+                            pass
             if accept_key_input:
                 keypress = self.key_queue.get()
 
