@@ -58,10 +58,14 @@ class Odemeter:
     def __init__(self):
         self.x: int = 0
         self.y: int = 0
+        self.last_x: int = 0
+        self.last_y: int = 0
         self.distance: int = 0
 
     def add(self, coord: tuple[int, int]):
         tmpx: int = round(coord[0] / 10)
         tmpy: int = round(coord[1] / 10)
-        self.distance += int(sqrt((tmpx - self.x) ** 2 + (tmpy - self.y) ** 2))
+        diff = int(sqrt((tmpx - self.x) ** 2 + (tmpy - self.y) ** 2))
+        if diff > 10:
+            self.distance += diff
         return self.distance
