@@ -88,6 +88,7 @@ class Scheduler:
         start = time()
         tmp_target = DroneInfo(-1, -1, -1, -1)
         fix_h = 1400
+        dac = 1
         while True:
             if time() - start > 1:
                 print("stage: ", self.stage)
@@ -112,7 +113,7 @@ class Scheduler:
                             self.around_count = 0
                         # if we are around the target for 5 times in a row,
                         # we are good to go
-                        if self.around_count >= 1:
+                        if self.around_count >= dac:
                             self.__stage_jump(2)
                 case 2:
                     if self.roaming is False:
@@ -126,7 +127,7 @@ class Scheduler:
                             self.around_count = 0
                         # if we are around the target for 5 times in a row,
                         # we are good to go
-                        if self.around_count >= 1:
+                        if self.around_count >= dac:
                             self.__stage_jump(3)
                 case 3:
                     if self.roaming is False:
@@ -140,7 +141,7 @@ class Scheduler:
                             self.around_count = 0
                         # if we are around the target for 5 times in a row,
                         # we are good to go
-                        if self.around_count >= 1:
+                        if self.around_count >= dac:
                             self.__stage_jump(4)
                 case 4:
                     if self.roaming is False:
@@ -154,7 +155,7 @@ class Scheduler:
                             self.around_count = 0
                         # if we are around the target for 5 times in a row,
                         # we are good to go
-                        if self.around_count >= 1:
+                        if self.around_count >= dac:
                             self.__stage_jump(5)
                 case 5:
                     if self.roaming is False:
@@ -168,7 +169,7 @@ class Scheduler:
                             self.around_count = 0
                         # if we are around the target for 5 times in a row,
                         # we are good to go
-                        if self.around_count >= 1:
+                        if self.around_count >= dac:
                             self.__stage_jump(6)
                 case 6:
                     if self.roaming is False:
@@ -182,7 +183,7 @@ class Scheduler:
                             self.around_count = 0
                         # if we are around the target for 5 times in a row,
                         # we are good to go
-                        if self.around_count >= 1:
+                        if self.around_count >= dac:
                             self.__stage_jump(7)
                 case 7:
                     if self.roaming is False:
@@ -196,7 +197,7 @@ class Scheduler:
                             self.around_count = 0
                         # if we are around the target for 5 times in a row,
                         # we are good to go
-                        if self.around_count >= 3:
+                        if self.around_count >= dac:
                             self.__stage_jump(8)
                 case 8:
                     if self.roaming is False:
@@ -210,7 +211,7 @@ class Scheduler:
                             self.around_count = 0
                         # if we are around the target for 5 times in a row,
                         # we are good to go
-                        if self.around_count >= 1:
+                        if self.around_count >= dac:
                             self.__stage_jump(9)
                 case 9:
                     if self.roaming is False:
@@ -238,7 +239,7 @@ class Scheduler:
                             self.around_count = 0
                         # if we are around the target for 5 times in a row,
                         # we are good to go
-                        if self.around_count >= 1:
+                        if self.around_count >= dac:
                             self.__stage_jump(11)
                 case 11:
                     if self.roaming is False:
@@ -252,7 +253,7 @@ class Scheduler:
                             self.around_count = 0
                         # if we are around the target for 5 times in a row,
                         # we are good to go
-                        if self.around_count >= 1:
+                        if self.around_count >= dac:
                             self.__stage_jump(12)
                 case 12:
                     if self.roaming is False:
@@ -266,7 +267,7 @@ class Scheduler:
                             self.around_count = 0
                         # if we are around the target for 5 times in a row,
                         # we are good to go
-                        if self.around_count >= 1:
+                        if self.around_count >= dac:
                             self.__stage_jump(13)
                 case 13:
                     if self.roaming is False:
@@ -280,7 +281,7 @@ class Scheduler:
                             self.around_count = 0
                         # if we are around the target for 5 times in a row,
                         # we are good to go
-                        if self.around_count >= 1:
+                        if self.around_count >= dac:
                             self.__stage_jump(14)
                 case 14:
                     if self.roaming is False:
@@ -294,7 +295,7 @@ class Scheduler:
                             self.around_count = 0
                         # if we are around the target for 5 times in a row,
                         # we are good to go
-                        if self.around_count >= 3:
+                        if self.around_count >= dac:
                             self.__stage_jump(15)
                 case 15:
                     if self.roaming is False:
@@ -308,7 +309,7 @@ class Scheduler:
                             self.around_count = 0
                         # if we are around the target for 5 times in a row,
                         # we are good to go
-                        if self.around_count >= 1:
+                        if self.around_count >= dac:
                             self.__stage_jump(16)
                 case 16:
                     if self.roaming is False:
@@ -322,7 +323,7 @@ class Scheduler:
                             self.around_count = 0
                         # if we are around the target for 5 times in a row,
                         # we are good to go
-                        if self.around_count >= 3:
+                        if self.around_count >= dac:
                             self.__stage_jump(17)
                 case 17:
                     if self.roaming is False:
@@ -336,7 +337,7 @@ class Scheduler:
                             self.around_count = 0
                         # if we are around the target for 5 times in a row,
                         # we are good to go
-                        if self.around_count >= 1:
+                        if self.around_count >= dac:
                             self.__stage_jump(18)
                 case 18:
                     if self.roaming is False:
@@ -350,7 +351,7 @@ class Scheduler:
                             self.around_count = 0
                         # if we are around the target for 5 times in a row,
                         # we are good to go
-                        if self.around_count >= 1:
+                        if self.around_count >= dac:
                             self.__stage_jump(19)
                 case 19:
                     if self.roaming is False:
@@ -364,7 +365,7 @@ class Scheduler:
                             self.around_count = 0
                         # if we are around the target for 5 times in a row,
                         # we are good to go
-                        if self.around_count >= 1:
+                        if self.around_count >= dac:
                             self.__stage_jump(20)
                 case 20:
                     if self.roaming is False:
@@ -378,7 +379,7 @@ class Scheduler:
                             self.around_count = 0
                         # if we are around the target for 5 times in a row,
                         # we are good to go
-                        if self.around_count >= 1:
+                        if self.around_count >= dac:
                             self.__stage_jump(21)
                 case 21:
                     if self.roaming is False:
@@ -392,7 +393,7 @@ class Scheduler:
                             self.around_count = 0
                         # if we are around the target for 5 times in a row,
                         # we are good to go
-                        if self.around_count >= 1:
+                        if self.around_count >= dac:
                             self.__stage_jump(22)
                 case 22:
                     if self.roaming is False:
@@ -406,7 +407,7 @@ class Scheduler:
                             self.around_count = 0
                         # if we are around the target for 5 times in a row,
                         # we are good to go
-                        if self.around_count >= 3:
+                        if self.around_count >= dac:
                             self.__stage_jump(23)
                 case 23:
                     if self.roaming is False:
@@ -420,7 +421,7 @@ class Scheduler:
                             self.around_count = 0
                         # if we are around the target for 5 times in a row,
                         # we are good to go
-                        if self.around_count >= 1:
+                        if self.around_count >= dac:
                             self.__stage_jump(24)
                 case 24:
                     if self.roaming is False:
@@ -434,7 +435,7 @@ class Scheduler:
                             self.around_count = 0
                         # if we are around the target for 5 times in a row,
                         # we are good to go
-                        if self.around_count >= 1:
+                        if self.around_count >= dac:
                             self.__stage_jump(25)
                 case 25:
                     if self.roaming is False:
@@ -448,7 +449,7 @@ class Scheduler:
                             self.around_count = 0
                         # if we are around the target for 5 times in a row,
                         # we are good to go
-                        if self.around_count >= 1:
+                        if self.around_count >= dac:
                             self.__stage_jump(26)
                 case 26:
                     if self.roaming is False:
@@ -462,7 +463,7 @@ class Scheduler:
                             self.around_count = 0
                         # if we are around the target for 5 times in a row,
                         # we are good to go
-                        if self.around_count >= 3:
+                        if self.around_count >= dac:
                             self.__stage_jump(27)
                 case 27:
                     if self.roaming is False:
@@ -476,7 +477,7 @@ class Scheduler:
                             self.around_count = 0
                         # if we are around the target for 5 times in a row,
                         # we are good to go
-                        if self.around_count >= 1:
+                        if self.around_count >= dac:
                             self.__stage_jump(28)
                 case 28:
                     if self.roaming is False:
@@ -490,7 +491,7 @@ class Scheduler:
                             self.around_count = 0
                         # if we are around the target for 5 times in a row,
                         # we are good to go
-                        if self.around_count >= 1:
+                        if self.around_count >= dac:
                             self.__stage_jump(29)
                 case 29:
                     if self.roaming is False:
@@ -504,7 +505,7 @@ class Scheduler:
                             self.around_count = 0
                         # if we are around the target for 5 times in a row,
                         # we are good to go
-                        if self.around_count >= 1:
+                        if self.around_count >= dac:
                             self.__stage_jump(30)
                 case 30:
                     if self.roaming is False:
@@ -518,7 +519,7 @@ class Scheduler:
                             self.around_count = 0
                         # if we are around the target for 5 times in a row,
                         # we are good to go
-                        if self.around_count >= 1:
+                        if self.around_count >= dac:
                             self.__stage_jump(31)
                 case 31:
                     if self.roaming is False:
@@ -532,7 +533,7 @@ class Scheduler:
                             self.around_count = 0
                         # if we are around the target for 5 times in a row,
                         # we are good to go
-                        if self.around_count >= 1:
+                        if self.around_count >= dac:
                             self.__stage_jump(32)
                 case 32:
                     if self.roaming is False:
