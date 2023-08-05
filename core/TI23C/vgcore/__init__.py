@@ -95,15 +95,18 @@ class proc:
             daemon=True,
         )
         pos_thread = Thread(target=self.transmit_handler, daemon=True)
+        take_off_thread = Thread(target=self.take_off_handler, daemon=True)
 
         tx_thread.start()
         rx_thread.start()
         bt_send_thread.start()
         bt_recv_thread.start()
         pos_thread.start()
+        take_off_thread.start()
 
         tx_thread.join()
         rx_thread.join()
         bt_send_thread.join()
         bt_recv_thread.join()
         pos_thread.join()
+        take_off_thread.join()
