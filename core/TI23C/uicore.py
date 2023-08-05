@@ -147,9 +147,12 @@ class proc:
 
         display_thread = Thread(target=self.interact_core, daemon=True)
         keyboard_thread = Thread(target=self.keyboard, daemon=True)
+        mapper_thread = Thread(target=self.mapper_core, daemon=True)
 
         display_thread.start()
         keyboard_thread.start()
+        mapper_thread.start()
 
         display_thread.join()
-        keyboard_thread.start()
+        keyboard_thread.join()
+        mapper_thread.join()
