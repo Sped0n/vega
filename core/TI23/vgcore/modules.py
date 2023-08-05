@@ -21,7 +21,7 @@ def bt_tx(client: BTClient, send_queue: Queue[str]) -> None:
 def bt_rx(client: BTClient, recv_queue: Queue[str]) -> None:
     while True:
         try:
-            pusher(recv_queue, client.recieve)
+            pusher(recv_queue, client.recieve())
         except ConntectionError:
             client.error_handle()
 
