@@ -120,13 +120,14 @@ class proc:
     def mapper_core(self):
         t = trailer()
         o_trail = Offsetter((28, 2), 1)
-        with canvas(self.disp_map) as draw_map:
-            # draw a map first, kinda like welcome screen
-            mapper(draw_map)
-            while True:
+        while True:
+            with canvas(self.disp_map) as draw_map:
                 self.mapper_enable.wait()
-                coord = self.to_mapper_queue.get()
                 mapper(draw_map)
+                try:
+                    coord = self.to_mapper_queue.get(timeout=0.2)
+                except Empty:
+                    continue
                 a, b = corrd2block(coord[0], coord[1])
                 t.add_dot(o_trail.calc(a, b))
                 t.darw(draw_map)
