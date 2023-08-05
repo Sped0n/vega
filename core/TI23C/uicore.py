@@ -129,7 +129,7 @@ class proc:
                     coord = self.to_mapper_queue.get(timeout=0.2)
                 except Empty:
                     continue
-                a, b = corrd2block(coord[0], coord[1])
+                a, b = corrd2block(coord[0] + 350, coord[1] - 350)  # 350 is the offset
                 t.add_dot(o_trail.calc(a, b))
                 t.darw(draw_map)
 
