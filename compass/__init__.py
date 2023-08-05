@@ -68,4 +68,6 @@ class Odemeter:
         diff = int(sqrt((tmpx - self.x) ** 2 + (tmpy - self.y) ** 2))
         if diff > 10:
             self.distance += diff
+            self.x = tmpx
+            self.y = tmpy
         return self.distance
