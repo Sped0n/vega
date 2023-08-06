@@ -30,7 +30,5 @@ def test_car_ti23():
     cp.start()
     up.start()
 
-    sleep(10)
-
-    cp.kill()
-    up.kill()
+    cp.join()
+    up.join()

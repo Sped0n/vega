@@ -58,8 +58,7 @@ def test_drone_ti23():
     mp.start()
     gp.start()
 
-    sleep(10)
-
     cp.kill()
     sp.kill()
     mp.kill()
+    gp.join()
