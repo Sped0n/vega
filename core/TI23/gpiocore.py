@@ -1,6 +1,6 @@
 from __future__ import annotations
 import wiringpi as wpi  # type:ignore
-from wiringppi import GPIO  # type:ignore
+from wiringpi import GPIO  # type:ignore
 from ctyper import Command
 from core.utils import get_cmd
 from multiprocessing import Queue as mQueue
