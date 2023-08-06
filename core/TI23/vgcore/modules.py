@@ -155,7 +155,7 @@ class Scheduler:
         coord_list: list[tuple[int, int]] = []
         for _ in range(30):
             try:
-                results = self.ml2vega_queue.get(timeout=0.1)
+                results = self.ml2vega_queue.get(timeout=0.1)["ti"]
                 for result in results:
                     cx = int((result.box.x0 + result.box.x1) / 2)
                     cy = int((result.box.y0 + result.box.y1) / 2)
