@@ -27,9 +27,11 @@ def bt_rx(client: BTClient, bt_start_event: Event, adv_event: Event) -> None:
             tmp = client.recieve()
             print("==> bt recv: ", tmp)
             if tmp == "PTTO1":
+                sleep(10)
                 set_thread_event(bt_start_event, True)
                 set_thread_event(adv_event, False)
             elif tmp == "PTTO2":
+                sleep(10)
                 set_thread_event(bt_start_event, True)
                 set_thread_event(adv_event, True)
         except ConntectionError:
