@@ -10,7 +10,7 @@ def is_around(
     status_queue: Queue[DroneInfo],
     z_Queue: Queue[int],
     target: DroneInfo,
-    pos_tolerance: int = 300,
+    pos_tolerance: int = 250,
     yaw_tolerance: int = 7,
 ) -> bool:
     """
