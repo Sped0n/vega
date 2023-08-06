@@ -50,7 +50,7 @@ class proc:
             raw_results = self.ti.infer(frame, conf_thres=0.15, nms_thres=0.5)
             results: list[ObjDetected] = filter_box(raw_results, frame)
 
-            pusher(self.ml2vega_queue, {"ti": results})
+            pusher(self.ml2vega_queue, results)
 
     def manager(self):
         while True:

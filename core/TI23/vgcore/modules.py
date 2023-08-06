@@ -155,7 +155,7 @@ class Scheduler:
         coord_list: list[tuple[int, int]] = []
         for _ in range(30):
             try:
-                results = self.ml2vega_queue.get(timeout=0.1)["ti"]
+                results = self.ml2vega_queue.get(timeout=0.1)
                 for result in results:
                     cx = int((result.box.x0 + result.box.x1) / 2)
                     cy = int((result.box.y0 + result.box.y1) / 2)
@@ -236,166 +236,110 @@ class Scheduler:
                     self.__go_square(3050, -850, fix_h, 7, dac)
 
                 case 7:
-                    # block 6
-                    self.__go_block(2700, -850, fix_h, 8, dac)
+                    # col 2 2
+                    self.__go_square(2450, -850, fix_h, 8, dac)
 
                 case 8:
-                    # fire 6
-                    self.__go_fire(fix_drop_h, 9, dac, 6)
+                    # col 2 3
+                    self.__go_square(1650, -850, fix_h, 9, dac, True)
 
                 case 9:
-                    # col 2 2
-                    self.__go_square(2450, -850, fix_h, 10, dac)
+                    # col 2 4
+                    self.__go_square(850, -850, fix_h, 10, dac)
 
                 case 10:
-                    # col 2 3
-                    self.__go_square(1650, -850, fix_h, 11, dac, True)
+                    # col 3 4
+                    self.__go_square(850, -1650, fix_h, 11, dac, True)
 
                 case 11:
-                    # block 1
-                    self.__go_block(1200, -650, fix_h, 12, dac)
+                    # col 3 3
+                    self.__go_square(1650, -1650, fix_h, 12, dac)
 
                 case 12:
-                    # fire 1
-                    self.__go_fire(fix_drop_h, 13, dac, 1)
+                    # col 3 2
+                    self.__go_square(2450, -1650, fix_h, 13, dac)
 
                 case 13:
-                    # col 2 4
-                    self.__go_square(850, -850, fix_h, 14, dac)
+                    # col 3 1
+                    self.__go_square(3050, -1650, fix_h, 14, dac)
 
                 case 14:
-                    # col 3 4
-                    self.__go_square(850, -1650, fix_h, 15, dac, True)
+                    # col 4 1
+                    self.__go_square(3050, -2450, fix_h, 15, dac)
 
                 case 15:
-                    # col 3 3
-                    self.__go_square(1650, -1650, fix_h, 16, dac)
+                    # col 4 2
+                    self.__go_square(2450, -2450, fix_h, 16, dac)
 
                 case 16:
-                    # col 3 2
-                    self.__go_square(2450, -1650, fix_h, 17, dac)
+                    # col 4 3
+                    self.__go_square(1650, -2450, fix_h, 17, dac, True)
 
                 case 17:
-                    # col 3 1
-                    self.__go_square(3050, -1650, fix_h, 18, dac)
+                    # col 4 4
+                    self.__go_square(850, -2450, fix_h, 18, dac)
 
                 case 18:
-                    # col 4 1
-                    self.__go_square(3050, -2450, fix_h, 19, dac)
+                    # col 5 4
+                    self.__go_square(850, -3250, fix_h, 19, dac, True)
 
                 case 19:
-                    # block 5
-                    self.__go_block(2700, -2350, fix_h, 20, dac)
+                    # col 5 3
+                    self.__go_square(1650, -3250, fix_h, 20, dac)
 
                 case 20:
-                    # fire 5
-                    self.__go_fire(fix_drop_h, 21, dac, 5)
+                    # col 5 2
+                    self.__go_square(2450, -3250, fix_h, 21, dac)
 
                 case 21:
-                    # col 4 2
-                    self.__go_square(2450, -2450, fix_h, 22, dac)
+                    # col 5 1
+                    self.__go_square(3050, -3250, fix_h, 22, dac)
 
                 case 22:
-                    # col 4 3
-                    self.__go_square(1650, -2450, fix_h, 23, dac, True)
+                    # col 6 1
+                    self.__go_square(3650, -3850, fix_h, 23, dac)
 
                 case 23:
-                    # block 2
-                    self.__go_block(1200, -2200, fix_h, 24, dac)
+                    # col 6 2
+                    self.__go_square(2450, -3850, fix_h, 24, dac)
 
                 case 24:
-                    # fire 2
-                    self.__go_fire(fix_drop_h, 25, dac, 2)
+                    # col 6 3
+                    self.__go_square(1650, -3850, fix_h, 25, dac, True)
 
                 case 25:
-                    # col 4 4
-                    self.__go_square(850, -2450, fix_h, 26, dac)
+                    # col 6 4-1
+                    self.__go_square(1050, -3850, fix_h, 26, dac)
 
                 case 26:
-                    # col 5 4
-                    self.__go_square(850, -3250, fix_h, 27, dac, True)
+                    # col 6 4-2
+                    self.__go_square(650, -3850, fix_h, 27, dac, True)
 
                 case 27:
-                    # col 5 3
-                    self.__go_square(1650, -3250, fix_h, 28, dac)
+                    # col 6 5
+                    self.__go_square(50, -3850, fix_h, 28, dac)
 
                 case 28:
-                    # col 5 2
-                    self.__go_square(2450, -3250, fix_h, 29, dac)
+                    # col 5 5
+                    self.__go_square(50, -3250, fix_h, 29, dac, True)
 
                 case 29:
-                    # col 5 1
-                    self.__go_square(3050, -3250, fix_h, 30, dac)
+                    # col 4 5
+                    self.__go_square(50, -2450, fix_h, 30, dac)
 
                 case 30:
-                    # col 6 1
-                    self.__go_square(3650, -3850, fix_h, 31, dac)
+                    # col 3 5
+                    self.__go_square(50, -1650, fix_h, 31, dac)
 
                 case 31:
-                    # block 4
-                    self.__go_block(2700, -3750, fix_h, 32, dac)
+                    # col 2 5
+                    self.__go_square(50, -850, fix_h, 32, dac)
 
                 case 32:
-                    # fire 4
-                    self.__go_fire(fix_drop_h, 33, dac, 4)
+                    # col 1 5
+                    self.__go_square(0, 0, fix_h, 33, dac)
 
                 case 33:
-                    # col 6 2
-                    self.__go_square(2450, -3850, fix_h, 34, dac)
-
-                case 34:
-                    # col 6 3
-                    self.__go_square(1650, -3850, fix_h, 35, dac, True)
-
-                case 35:
-                    # block 3(1)
-                    self.__go_block(1250, -3750, fix_h, 36, dac)
-
-                case 36:
-                    # fire 3(1)
-                    self.__go_fire(fix_drop_h, 37, dac, 3)
-
-                case 37:
-                    # col 6 4-1
-                    self.__go_square(1050, -3850, fix_h, 38, dac)
-
-                case 38:
-                    # col 6 4-2
-                    self.__go_square(650, -3850, fix_h, 39, dac, True)
-
-                case 39:
-                    # block 3(2)
-                    self.__go_block(460, -3750, fix_h, 40, dac)
-
-                case 40:
-                    # fire 3(2)
-                    self.__go_fire(fix_drop_h, 41, dac, 3)
-
-                case 41:
-                    # col 6 5
-                    self.__go_square(50, -3850, fix_h, 42, dac)
-
-                case 41:
-                    # col 5 5
-                    self.__go_square(50, -3250, fix_h, 42, dac, True)
-
-                case 42:
-                    # col 4 5
-                    self.__go_square(50, -2450, fix_h, 43, dac)
-
-                case 43:
-                    # col 3 5
-                    self.__go_square(50, -1650, fix_h, 44, dac)
-
-                case 44:
-                    # col 2 5
-                    self.__go_square(50, -850, fix_h, 45, dac)
-
-                case 45:
-                    # col 1 5
-                    self.__go_square(0, 0, fix_h, 46, dac)
-
-                case 46:
                     if self.roaming is False:
                         self.tmp_target = DroneInfo(0, 0, 0, 0, True)
                     else:
