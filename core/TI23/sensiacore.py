@@ -22,7 +22,7 @@ class proc:
         sleep(0.5)
         self.t = T265("Tracking Module")
         sleep(0.5)  # need some time to start another rs pipe
-        self.c = AsyncCam(width=1280, height=720)
+        self.c = AsyncCam(width=640, height=480)
 
         # proc queue init
         self.pose_queue = pose_queue
@@ -30,8 +30,6 @@ class proc:
         self.vega2sensia_queue = vega2sensia_queue
 
         # default enable options
-        self.depth_enable: Event = Event()
-        self.depth_enable.clear()  # depth: default disable
         self.pose_enable: Event = Event()
         self.pose_enable.set()  # pose: default enable
         self.cam_enable: Event = Event()
@@ -73,7 +71,6 @@ class proc:
         while True:
             cmd: Command = self.vega2sensia_queue.get()
             get_cmd(cmd, "pose", self.pose_enable)
-            get_cmd(cmd, "depth", self.depth_enable)
             get_cmd(cmd, "cam", self.cam_enable)
 
     def run(self):

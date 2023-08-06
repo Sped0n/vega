@@ -23,7 +23,7 @@ class proc:
     ) -> None:
         isize = InputSize(416, 416)
         # model init
-        self.ti = Model(DATA_DIR + "ti2022", isize, "ncnn")
+        self.ti = Model(DATA_DIR + "ti2023", isize, "ncnn")
 
         # proc queue init
         self.cam_queue = cam_queue
@@ -47,7 +47,7 @@ class proc:
                 continue
 
             # data process
-            raw_results = self.ti.infer(frame)
+            raw_results = self.ti.infer(frame, conf_thres=0.15, nms_thres=0.5)
             results: list[ObjDetected] = filter_box(raw_results, frame)
 
             pusher(self.ml2vega_queue, {"ti": results})

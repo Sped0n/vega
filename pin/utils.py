@@ -58,3 +58,16 @@ def depack_recv_list_to_z(recv: list[int]) -> int:
     if not (recv[0] == 85 and recv[1] == 170 and recv[2] == 255 and recv[6] == 170):
         raise PackCorruptedError("head or tail error")
     return int(recv[4] << 8) + int(recv[5])
+
+
+def create_uart_buf_car(fire: int):
+    return bytearray(
+        [
+            0x55,
+            0xAA,
+            0x50,
+            0x01,  # dec 1, hex 1
+            abs(fire) & 0x00FF,
+            0xAA,
+        ]
+    )

@@ -19,12 +19,14 @@ class Transmit:
         fire_x: int | None = None,
         fire_y: int | None = None,
         stage: int | None = None,
+        fire: int | None = None,
     ) -> None:
         self.x = x
         self.y = y
         self.fire_x = fire_x
         self.fire_y = fire_y
         self.stage = stage
+        self.fire = fire
 
 
 def bt_tx(client: BTServer, send_queue: Queue[str]) -> None:

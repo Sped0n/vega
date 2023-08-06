@@ -2,6 +2,8 @@ from math import sqrt
 from queue import Queue, Empty
 
 from core.utils import DroneInfo
+import numpy as np
+from ctyper import Number
 
 
 def is_around(
@@ -63,3 +65,37 @@ class Odemeter:
             self.x = tmpx
             self.y = tmpy
         return self.distance
+
+
+def pixel_to_coord(
+    center: tuple[int, int],
+    pixel: tuple[int, int],
+    coord: tuple[int, int],
+    height,
+    wfov: float = 42.3,
+    hfov: float = 33,
+    w=640,
+    h=480,
+):
+    pixel_x_diff = center[0] - pixel[0]
+    x_diff_degree = (pixel_x_diff / w) * wfov
+    x_rad = np.deg2rad(x_diff_degree)
+    x_diff = abs(height * np.tan(x_rad))
+    if pixel_x_diff < 0:
+        x_diff = -x_diff
+    pixel_y_diff = center[1] - pixel[1]
+    y_diff_degree = (pixel_y_diff / h) * hfov
+    y_rad = np.deg2rad(y_diff_degree)
+    y_diff = abs(height * np.tan(y_rad))
+    if pixel_y_diff < 0:
+        y_diff = -y_diff
+    return coord[0] + y_diff, coord[1] + x_diff
+
+
+def get_avg_coord(coord_list: list[tuple[int, int]]) -> tuple[int, int]:
+    x: int = 0
+    y: int = 0
+    for i in coord_list:
+        x += i[0]
+        y += i[1]
+    return int(x / len(coord_list)), (y // len(coord_list))

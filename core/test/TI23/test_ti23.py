@@ -6,6 +6,7 @@ from cfg import NORS
 from core.TI23.sensiacore import proc as sensiaproc
 from core.TI23.vgcore import proc as vgproc
 from core.TI23.mlcore import proc as mlproc
+from core.TI23.gpiocore import proc as gpioproc
 
 
 def test_drone_ti23():
@@ -16,6 +17,7 @@ def test_drone_ti23():
     vega2sensia_q = mQueue(5)
     vega2ml_q = mQueue(5)
     ml2vega_q = mQueue(5)
+    vega2gpio_q = mQueue(5)
 
     cp = Process(
         target=vgproc,
@@ -24,6 +26,7 @@ def test_drone_ti23():
             ml2vega_q,
             vega2sensia_q,
             vega2ml_q,
+            vega2gpio_q,
         ),
         daemon=True,
     )
@@ -48,9 +51,12 @@ def test_drone_ti23():
         daemon=True,
     )
 
+    gp = Process(target=gpioproc, args=(vega2gpio_q,), daemon=True)
+
     cp.start()
     sp.start()
     mp.start()
+    gp.start()
 
     sleep(10)
 

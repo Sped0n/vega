@@ -13,20 +13,20 @@ def filter_box(raw_results: list[ObjDetected], frame: Image) -> list[ObjDetected
         h: int = result.box.y1 - result.box.y0
         # if it is not a square, skip
         if not abs(w - h) / (w + h) < 0.04:
-            continue
-        # create roi
-        roi: Image = cv2.cvtColor(
-            frame[
-                int(cy - 0.17 * h) : int(cy + 0.17 * h),
-                int(cx - 0.17 * w) : int(cx + 0.17 * w),
-            ],
-            cv2.COLOR_BGR2HSV,
-        )
-        # creat mask
-        mask: Array = cv2.inRange(roi, lower_red1, upper_red1) + cv2.inRange(
-            roi, lower_red2, upper_red2
-        )
-        # new score
-        result.score = len(mask[mask > 0]) / len(mask)
+            # create roi
+            roi: Image = cv2.cvtColor(
+                frame[
+                    int(cy - 0.17 * h) : int(cy + 0.17 * h),
+                    int(cx - 0.17 * w) : int(cx + 0.17 * w),
+                ],
+                cv2.COLOR_BGR2HSV,
+            )
+            # creat mask
+            mask: Array = cv2.inRange(roi, lower_red1, upper_red1) + cv2.inRange(
+                roi, lower_red2, upper_red2
+            )
+            # new score
+            result.score = len(mask[mask > 0]) / len(mask)
+            result.clsid = 1
         results.append(result)
     return results

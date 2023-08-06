@@ -4,10 +4,12 @@ from multiprocessing import Queue as mQueue
 from queue import Queue
 from threading import Thread
 from time import sleep
+from pin import SerDevice
 
 
 from bt import BTServer
 from core.utils import pusher
+from pin.utils import create_uart_buf_car
 
 from .modules import bt_rx, bt_tx, Transmit
 
@@ -15,17 +17,11 @@ from .modules import bt_rx, bt_tx, Transmit
 class proc:
     def __init__(
         self,
-        ml2vega_queue: mQueue,  # input
         ui2vega_queue: mQueue,  # input, used for set take off sending op flag
         transmit_queue: mQueue[Transmit],  # output
-        vega2media_queue: mQueue,  # output
-        vega2ml_queue: mQueue,  # output
     ) -> None:
         # proc queue init
-        self.ml2vega_queue = ml2vega_queue
         self.transmit_queue = transmit_queue
-        self.vega2media_queue = vega2media_queue
-        self.vega2ml_queue = vega2ml_queue
         self.ui2vega_queue = ui2vega_queue
 
         # thread queue init
@@ -34,15 +30,24 @@ class proc:
         self.key1_queue: Queue[int] = Queue(3)  # queue for keyboard stream 1
         self.key2_queue: Queue[int] = Queue(3)  # basically the same as stream 1
 
+        # fire queue
+        self.fire_queue = Queue(3)
+
         # bt server
         self.bt = BTServer("875c95f9-e17d-4877-b96a-f559e5bff58c")
+        self.uart = SerDevice("/dev/ttyS4", 115200)
 
         # run it
         self.run()
 
     def tx(self):
         # init target
-        pass
+        while True:
+            tmp = self.fire_queue.get()
+            # create uart buf
+            buf = create_uart_buf_car(tmp)
+            # send pose and target
+            self.uart.write(buf)
 
     def rx(self):
         pass
@@ -52,7 +57,7 @@ class proc:
             # get data from queue
             tmp: str = self.bt_rx_queue.get()
             _slice = tmp.split(",")
-            if len(_slice) != 5:
+            if len(_slice) != 6:
                 continue
             tmp1 = Transmit(
                 x=int(_slice[0]),
@@ -63,6 +68,9 @@ class proc:
                 tmp1.fire_y = int(_slice[3])
             if _slice[4] != "N/A":
                 tmp1.stage = int(_slice[4])
+            tmp1.fire = int(_slice[5])
+            # push fire
+            pusher(self.fire_queue, tmp1.fire)
 
             pusher(self.transmit_queue, tmp1)
 

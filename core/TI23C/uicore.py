@@ -91,7 +91,9 @@ class proc:
                     case 3:
                         if accept_key_input:
                             accept_key_input = False  # prevent keypress
-                            pusher(self.ui2vega_queue, "PTTO")  # permission to take off
+                            pusher(
+                                self.ui2vega_queue, "PTTO1"
+                            )  # permission to take off
                         t_pack = self.transmit_queue.get()
                         # send x and y to mapper
                         pusher(self.to_mapper_queue, (t_pack.x, t_pack.y))
@@ -103,7 +105,7 @@ class proc:
                     case 4:
                         if accept_key_input:
                             accept_key_input = False  # prevent keypress
-                            pusher(self.ui2vega_queue, "PTTO")  # permision to take off
+                            pusher(self.ui2vega_queue, "PTTO2")  # permision to take off
                         t_pack = self.transmit_queue.get()
                         # send x and y to mapper
                         pusher(self.to_mapper_queue, (t_pack.x, t_pack.y))
