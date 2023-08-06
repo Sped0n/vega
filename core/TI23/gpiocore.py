@@ -14,7 +14,7 @@ class proc:
         # output
     ) -> None:
         self.ctl_queue = ctl_queue
-        wpi.wiringpiSetup()
+        wpi.wiringPiSetup()
         # high io
         wpi.pinMode(3, GPIO.OUTPUT)
         wpi.pinMode(16, GPIO.OUTPUT)
